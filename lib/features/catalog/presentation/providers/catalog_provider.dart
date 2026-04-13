@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 
 import '../../data/repositories/catalog_repository.dart';
 import '../../domain/models/category.dart';
@@ -42,18 +41,21 @@ class ProductPaginationState {
   }
 }
 
-final productsProvider = StateNotifierProvider<ProductNotifier, ProductPaginationState>((ref) {
-  final repo = ref.watch(catalogRepositoryProvider);
-  return ProductNotifier(repo);
+final productsProvider = NotifierProvider<ProductNotifier, ProductPaginationState>(() {
+  return ProductNotifier();
 });
 
-class ProductNotifier extends StateNotifier<ProductPaginationState> {
-  final CatalogRepository _repository;
+class ProductNotifier extends Notifier<ProductPaginationState> {
+  late CatalogRepository _repository;
   String? _currentSearch;
   int? _currentCategoryId;
 
-  ProductNotifier(this._repository) : super(ProductPaginationState()) {
-    fetchInitialProducts();
+  @override
+  ProductPaginationState build() {
+    _repository = ref.watch(catalogRepositoryProvider);
+    // Trigger initial fetch
+    Future.microtask(() => fetchInitialProducts());
+    return ProductPaginationState();
   }
 
   Future<void> fetchInitialProducts({String? search, int? categoryId}) async {
@@ -72,6 +74,30 @@ class ProductNotifier extends StateNotifier<ProductPaginationState> {
         products: response.results,
         isLoading: false,
         currentPage: 1,
+        hasMore: response.currentPage < response.totalPages,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  Future<void> fetchNextPage() async {
+    if (state.isLoading || !state.hasMore) return;
+
+    state = state.copyWith(isLoading: true);
+
+    try {
+      final nextPage = state.currentPage + 1;
+      final response = await _repository.getProducts(
+        page: nextPage,
+        search: _currentSearch,
+        categoryId: _currentCategoryId,
+      );
+
+      state = state.copyWith(
+        products: [...state.products, ...response.results],
+        isLoading: false,
+        currentPage: nextPage,
         hasMore: response.currentPage < response.totalPages,
       );
     } catch (e) {

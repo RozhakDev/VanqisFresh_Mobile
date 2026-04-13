@@ -1,6 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../features/catalog/domain/models/product.dart';
+import '../../features/catalog/presentation/screens/home_screen.dart';
+import '../../features/catalog/presentation/screens/product_detail_screen.dart';
+import '../../features/cart/presentation/screens/cart_screen.dart';
+import '../../features/checkout/presentation/screens/checkout_screen.dart';
+import '../../features/checkout/presentation/screens/upload_proof_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -10,47 +16,34 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/',
         name: 'home',
-        builder: (context, state) => const _PlaceholderScreen('Katalog Produk'),
+        builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(
         path: '/product/:id',
         name: 'product_detail',
         builder: (context, state) {
-          final id = state.pathParameters['id'];
-          return _PlaceholderScreen('Detail Produk $id');
+          final product = state.extra as Product;
+          return ProductDetailScreen(product: product);
         },
       ),
       GoRoute(
         path: '/cart',
         name: 'cart',
-        builder: (context, state) => const _PlaceholderScreen('Keranjang Belanja'),
+        builder: (context, state) => const CartScreen(),
       ),
       GoRoute(
         path: '/checkout',
         name: 'checkout',
-        builder: (context, state) => const _PlaceholderScreen('Checkout'),
+        builder: (context, state) => const CheckoutScreen(),
       ),
       GoRoute(
         path: '/upload-proof/:id',
         name: 'upload_proof',
         builder: (context, state) {
-          final id = state.pathParameters['id'];
-          return _PlaceholderScreen('Upload Bukti Order: $id');
+          final id = state.pathParameters['id']!;
+          return UploadProofScreen(publicId: id);
         },
       ),
     ],
   );
 });
-
-class _PlaceholderScreen extends StatelessWidget {
-  final String title;
-  const _PlaceholderScreen(this.title);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: Center(child: Text(title, style: const TextStyle(fontSize: 20))),
-    );
-  }
-}
