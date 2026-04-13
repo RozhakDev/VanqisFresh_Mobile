@@ -5,6 +5,7 @@ import '../../../../core/network/api_exception.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../domain/models/category.dart';
 import '../../domain/models/product.dart';
+import '../../domain/models/promo.dart';
 
 final catalogRepositoryProvider = Provider<CatalogRepository>((ref) {
   final dio = ref.watch(dioProvider);
@@ -41,6 +42,18 @@ class CatalogRepository {
 
     final response = await _dio.get('/catalog/products/', queryParameters: queryParams);
       return ProductPaginatedResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      throw ApiException.fromDioError(e);
+    } catch (e) {
+      throw ApiException(e.toString());
+    }
+  }
+
+  Future<List<Promo>> getPromos() async {
+    try {
+      final response = await _dio.get('/catalog/promos/');
+      final data = response.data as List;
+      return data.map((json) => Promo.fromJson(json)).toList();
     } on DioException catch (e) {
       throw ApiException.fromDioError(e);
     } catch (e) {

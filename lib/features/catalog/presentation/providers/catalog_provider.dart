@@ -3,10 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/repositories/catalog_repository.dart';
 import '../../domain/models/category.dart';
 import '../../domain/models/product.dart';
+import '../../domain/models/promo.dart';
 
 final categoriesProvider = FutureProvider<List<Category>>((ref) async {
-  final repo = ref.watch(catalogRepositoryProvider);
-  return repo.getCategories();
+  return ref.watch(catalogRepositoryProvider).getCategories();
+});
+
+final promosProvider = FutureProvider<List<Promo>>((ref) async {
+  return ref.watch(catalogRepositoryProvider).getPromos();
 });
 
 class ProductPaginationState {
@@ -53,7 +57,6 @@ class ProductNotifier extends Notifier<ProductPaginationState> {
   @override
   ProductPaginationState build() {
     _repository = ref.watch(catalogRepositoryProvider);
-    // Trigger initial fetch
     Future.microtask(() => fetchInitialProducts());
     return ProductPaginationState();
   }

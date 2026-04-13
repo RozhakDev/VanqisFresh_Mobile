@@ -6,6 +6,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../cart/presentation/providers/cart_provider.dart';
 import '../providers/catalog_provider.dart';
 import '../widgets/product_card.dart';
+import '../widgets/promo_section.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -123,6 +124,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
 
             const SliverToBoxAdapter(child: SizedBox(height: 16)),
+
+            const PromoSection(),
 
             if (productState.error != null && productState.products.isEmpty)
               SliverToBoxAdapter(
