@@ -4,8 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/repositories/checkout_repository.dart';
 import '../../domain/models/checkout_models.dart';
 import '../../domain/models/payment_method.dart';
+import '../../../orders/presentation/providers/order_provider.dart';
 
-final paymentMethodProvider = FutureProvider<List<PaymentMethod>>((ref) async {
+final paymentMethodsProvider = FutureProvider<List<PaymentMethod>>((ref) async {
   return ref.watch(checkoutRepositoryProvider).getPaymentMethods();
 });
 
@@ -46,6 +47,9 @@ class CheckoutNotifier extends Notifier<CheckoutState> {
     state = state.copyWith(isLoading: true, error: null);
     try {
       final response = await _repository.checkout(request);
+      
+      ref.read(orderHistoryProvider.notifier).saveOrder(response.publicId, response.accessToken);
+      
       state = state.copyWith(isLoading: false, orderResponse: response);
       return true;
     } catch (e) {
@@ -56,10 +60,7 @@ class CheckoutNotifier extends Notifier<CheckoutState> {
 
   Future<bool> uploadProof(File imageFile) async {
     final orderResponse = state.orderResponse;
-    if (orderResponse == null) {
-      state = state.copyWith(error: "Order data not found. Please try checkout again.");
-      return false;
-    }
+    if (orderResponse == null) return false;
 
     state = state.copyWith(isLoading: true, error: null);
     try {

@@ -7,6 +7,9 @@ import '../../features/catalog/presentation/screens/product_detail_screen.dart';
 import '../../features/cart/presentation/screens/cart_screen.dart';
 import '../../features/checkout/presentation/screens/checkout_screen.dart';
 import '../../features/checkout/presentation/screens/upload_proof_screen.dart';
+import '../../features/orders/domain/models/order_models.dart';
+import '../../features/orders/presentation/screens/order_history_screen.dart';
+import '../../features/orders/presentation/screens/order_detail_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -42,6 +45,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = state.pathParameters['id']!;
           return UploadProofScreen(publicId: id);
+        },
+      ),
+      GoRoute(
+        path: '/orders',
+        name: 'order_history',
+        builder: (context, state) => const OrderHistoryScreen(),
+      ),
+      GoRoute(
+        path: '/orders/detail',
+        name: 'order_detail',
+        builder: (context, state) {
+          final localOrder = state.extra as LocalOrder;
+          return OrderDetailScreen(localOrder: localOrder);
         },
       ),
     ],

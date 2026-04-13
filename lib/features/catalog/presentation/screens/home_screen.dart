@@ -49,6 +49,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         title: const Text('VanqisMart', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
         centerTitle: false,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.receipt_long_outlined, color: AppColors.textPrimary),
+            onPressed: () => context.push('/orders'),
+          ),
           Stack(
             alignment: Alignment.center,
             children: [

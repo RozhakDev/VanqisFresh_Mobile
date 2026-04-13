@@ -67,7 +67,7 @@ class _UploadProofScreenState extends ConsumerState<UploadProofScreen> {
   @override
   Widget build(BuildContext context) {
     final isLoading = ref.watch(checkoutNotifierProvider).isLoading;
-    final paymentMethodsAsync = ref.watch(paymentMethodProvider);
+    final paymentMethodsAsync = ref.watch(paymentMethodsProvider);
     final orderResponse = ref.watch(checkoutNotifierProvider).orderResponse;
 
     return Scaffold(
