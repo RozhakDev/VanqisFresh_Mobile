@@ -6,7 +6,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../cart/presentation/providers/cart_provider.dart';
+import '../../data/repositories/checkout_repository.dart';
 import '../../domain/models/checkout_models.dart';
+import '../../domain/models/payment_method.dart';
 import '../providers/checkout_provider.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
@@ -46,22 +48,120 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   }
 
   void _processWhatsAppOrder() async {
-    final name = _nameController.text;
-    final note = _noteController.text;
+    final name = _nameController.text.trim();
+    final note = _noteController.text.trim();
     final cartItems = ref.read(cartProvider);
     final totalPrice = ref.read(cartProvider.notifier).totalPrice;
 
-    String itemsText = cartItems.map((e) => "- ${e.product.name} (${e.quantity}x)").join('\n');
-    String msg = "Halo VanqisMart,\nSaya ingin memesan:\n$itemsText\n\nTotal: ${CurrencyFormat.convertToIdr(totalPrice)}\nNama: $name\nCatatan: $note";
-    
-    final waUrl = Uri.parse("https://wa.me/6283847921480?text=${Uri.encodeComponent(msg)}");
-    if (await canLaunchUrl(waUrl)) {
-      await launchUrl(waUrl, mode: LaunchMode.externalApplication);
-      if(mounted) {
-         ref.read(cartProvider.notifier).clearCart();
-         context.go('/');
-      }
+    final itemsText =
+        cartItems.map((e) => "- ${e.product.name} (${e.quantity}x)").join('\n');
+    final msg = StringBuffer()
+      ..writeln('Halo VanqisMart,')
+      ..writeln('Saya ingin memesan:')
+      ..writeln(itemsText)
+      ..writeln()
+      ..writeln('Total: ${CurrencyFormat.convertToIdr(totalPrice)}')
+      ..writeln('Nama: $name');
+
+    if (note.isNotEmpty) {
+      msg.writeln('Catatan: $note');
     }
+
+    final contact =
+        await ref.read(checkoutRepositoryProvider).getWhatsAppContact();
+    final phoneNumber = _extractWhatsAppPhoneNumber(contact);
+
+    if (phoneNumber == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Kontak WhatsApp toko belum tersedia.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+      return;
+    }
+
+    final nativeUrl = Uri.parse(
+      'whatsapp://send/?phone=$phoneNumber&text=${Uri.encodeComponent(msg.toString().trim())}',
+    );
+    final fallbackUrl = _buildWhatsAppWebUrl(
+      contact: contact,
+      phoneNumber: phoneNumber,
+      message: msg.toString().trim(),
+    );
+
+    var launched = false;
+
+    try {
+      if (await canLaunchUrl(nativeUrl)) {
+        launched = await launchUrl(
+          nativeUrl,
+          mode: LaunchMode.externalApplication,
+        );
+      }
+
+      if (!launched) {
+        launched = await launchUrl(
+          fallbackUrl,
+          mode: LaunchMode.externalApplication,
+        );
+      }
+    } catch (_) {
+      launched = false;
+    }
+
+    if (!mounted) return;
+
+    if (launched) {
+      ref.read(cartProvider.notifier).clearCart();
+      context.go('/');
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Gagal membuka WhatsApp.'),
+        backgroundColor: AppColors.error,
+      ),
+    );
+  }
+
+  String? _extractWhatsAppPhoneNumber(StoreContact? contact) {
+    if (contact == null) return null;
+
+    final accountId = contact.accountId?.replaceAll(RegExp(r'[^0-9]'), '');
+    if (accountId != null && accountId.isNotEmpty) {
+      return accountId;
+    }
+
+    final digitsFromUrl = contact.url.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digitsFromUrl.isNotEmpty) {
+      return digitsFromUrl;
+    }
+
+    return null;
+  }
+
+  Uri _buildWhatsAppWebUrl({
+    required StoreContact? contact,
+    required String phoneNumber,
+    required String message,
+  }) {
+    final parsedUrl = contact == null ? null : Uri.tryParse(contact.url);
+    if (parsedUrl != null && parsedUrl.hasScheme) {
+      return parsedUrl.replace(
+        queryParameters: {
+          ...parsedUrl.queryParameters,
+          'text': message,
+        },
+      );
+    }
+
+    return Uri.https('wa.me', '/$phoneNumber', {
+      'text': message,
+    });
   }
 
   void _processTransferOrder() async {
@@ -130,14 +230,29 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       subtitle: const Text('Upload bukti transfer di akhir pesanan'),
                       value: 'transfer',
                       groupValue: _selectedPaymentMethod,
+                      selected: _selectedPaymentMethod == 'transfer',
                       activeColor: AppColors.primary,
+                      fillColor: MaterialStateProperty.resolveWith<Color>((states) {
+                        if (states.contains(MaterialState.selected)) {
+                          return AppColors.primary;
+                        }
+                        return AppColors.textSecondary;
+                      }),
                       onChanged: (val) => setState(() => _selectedPaymentMethod = val!),
                     ),
                     RadioListTile<String>(
                       title: const Text('Pesan via WhatsApp'),
                       subtitle: const Text('Transaksi manual lewat chat admin'),
                       value: 'whatsapp',
+                      groupValue: _selectedPaymentMethod,
+                      selected: _selectedPaymentMethod == 'whatsapp',
                       activeColor: AppColors.primary,
+                      fillColor: MaterialStateProperty.resolveWith<Color>((states) {
+                        if (states.contains(MaterialState.selected)) {
+                          return AppColors.primary;
+                        }
+                        return AppColors.textSecondary;
+                      }),
                       onChanged: (val) => setState(() => _selectedPaymentMethod = val!),
                     ),
                   ],
@@ -152,7 +267,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
             child: Text(
               _selectedPaymentMethod == 'whatsapp' 
-                  ? 'Pesan Sekarang via WA' 
+                  ? 'Pesan Sekarang via WhatsApp' 
                   : 'Bayar ${CurrencyFormat.convertToIdr(totalPrice)}',
               style: const TextStyle(fontSize: 16),
             ),

@@ -78,14 +78,30 @@ class CheckoutRepository {
     }
   }
 
-  Future<String?> getWhatsAppContactUrl() async {
+  Future<StoreContact?> getWhatsAppContact() async {
     try {
       final response = await _dio.get('/core/contacts/');
-      final data = response.data as List;
-      final contacts = data.map((json) => StoreContact.fromJson(json)).toList();
+      final responseData = response.data;
+      final List<dynamic> data;
 
-      final waContact = contacts.where((c) => c.platform == 'whatsapp').firstOrNull;
-      return waContact?.url;
+      if (responseData is List) {
+        data = responseData;
+      } else if (responseData is Map<String, dynamic> &&
+          responseData['results'] is List) {
+        data = responseData['results'] as List<dynamic>;
+      } else {
+        return null;
+      }
+
+      final contacts = data
+          .whereType<Map<String, dynamic>>()
+          .map(StoreContact.fromJson)
+          .toList();
+
+      final waContact = contacts
+          .where((c) => c.platform.toLowerCase() == 'whatsapp')
+          .firstOrNull;
+      return waContact;
     } catch (e) {
       return null;
     }

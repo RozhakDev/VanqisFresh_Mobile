@@ -29,13 +29,19 @@ class PaymentMethod {
 
 class StoreContact {
   final String platform;
+  final String? accountId;
   final String url;
 
-  StoreContact({required this.platform, required this.url});
+  StoreContact({
+    required this.platform,
+    required this.url,
+    this.accountId,
+  });
 
   factory StoreContact.fromJson(Map<String, dynamic> json) {
     return StoreContact(
       platform: json['platform'] as String,
+      accountId: json['account_id'] as String?,
       url: json['url'] as String,
     );
   }

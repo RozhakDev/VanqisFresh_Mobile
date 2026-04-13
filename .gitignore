@@ -25,6 +25,7 @@ migrate_working_dir/
 
 # VSCode
 .vscode/
+.codex
 
 # Flutter / Dart
 **/doc/api/
