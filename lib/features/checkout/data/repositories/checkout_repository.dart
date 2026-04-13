@@ -71,8 +71,22 @@ class CheckoutRepository {
   Future<List<PaymentMethod>> getPaymentMethods() async {
     try {
       final response = await _dio.get('/core/payments/');
-      final data = response.data as List;
-      return data.map((json) => PaymentMethod.fromJson(json)).toList();
+      final responseData = response.data;
+      final List<dynamic> data;
+
+      if (responseData is List) {
+        data = responseData;
+      } else if (responseData is Map<String, dynamic> &&
+          responseData['results'] is List) {
+        data = responseData['results'] as List<dynamic>;
+      } else {
+        return [];
+      }
+
+      return data
+          .whereType<Map<String, dynamic>>()
+          .map(PaymentMethod.fromJson)
+          .toList();
     } on DioException catch (e) {
       throw ApiException.fromDioError(e);
     }
