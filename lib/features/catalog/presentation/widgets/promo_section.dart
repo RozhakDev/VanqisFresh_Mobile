@@ -1,4 +1,3 @@
-// lib/features/catalog/presentation/widgets/promo_section.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -15,7 +14,6 @@ class PromoSection extends ConsumerWidget {
 
     return promosAsync.when(
       data: (promos) {
-        // Filter hanya promo yang aktif dan memiliki produk
         final activePromos = promos.where((p) => p.isActive && p.products.isNotEmpty).toList();
         
         if (activePromos.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
@@ -27,7 +25,7 @@ class PromoSection extends ConsumerWidget {
               return Container(
                 margin: const EdgeInsets.only(bottom: 24),
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                color: AppColors.primary.withOpacity(0.05), // Background highlight lembut
+                color: AppColors.primary.withOpacity(0.05),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -57,9 +55,8 @@ class PromoSection extends ConsumerWidget {
                       ),
                     ],
                     const SizedBox(height: 16),
-                    // Horizontal Scroll untuk produk promo
                     SizedBox(
-                      height: 260, // Tinggi card produk (disesuaikan)
+                      height: 260,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -67,7 +64,7 @@ class PromoSection extends ConsumerWidget {
                         itemBuilder: (context, pIndex) {
                           final product = promo.products[pIndex];
                           return Container(
-                            width: 160, // Lebar card tetap agar rapi saat di-scroll
+                            width: 160,
                             margin: const EdgeInsets.only(right: 16),
                             child: ProductCard(product: product),
                           );
@@ -85,7 +82,7 @@ class PromoSection extends ConsumerWidget {
       loading: () => const SliverToBoxAdapter(
         child: Padding(padding: EdgeInsets.all(16), child: Center(child: CircularProgressIndicator())),
       ),
-      error: (error, stack) => const SliverToBoxAdapter(child: SizedBox.shrink()), // Sembunyikan jika error
+      error: (error, stack) => const SliverToBoxAdapter(child: SizedBox.shrink()),
     );
   }
 }
