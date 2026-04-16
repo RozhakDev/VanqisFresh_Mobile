@@ -14,20 +14,20 @@ void main() async {
 
   runApp(
     const ProviderScope(
-      child: VanqisMartApp(),
+      child: VanqisFreshApp(),
     ),
   );
 }
 
-class VanqisMartApp extends ConsumerWidget {
-  const VanqisMartApp({super.key});
+class VanqisFreshApp extends ConsumerWidget {
+  const VanqisFreshApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
-      title: 'VanqisMart',
+      title: 'VanqisFresh',
       theme: AppTheme.lightTheme,
       routerConfig: router,
       debugShowCheckedModeBanner: false,

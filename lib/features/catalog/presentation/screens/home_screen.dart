@@ -209,7 +209,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'VanqisMart',
+                  'VanqisFresh',
                   style: GoogleFonts.inter(
                     color: Colors.white,
                     fontSize: 20,
