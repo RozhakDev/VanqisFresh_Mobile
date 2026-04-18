@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/catalog_provider.dart';
 import '../widgets/product_card.dart';
 import '../widgets/promo_banner_carousel.dart';
@@ -183,6 +185,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildDrawer(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
     return Drawer(
       backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
@@ -209,7 +213,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'VanqisFresh',
+                  authState.isAuthenticated 
+                      ? 'Halo, ${authState.user?.firstName ?? "User"}!' 
+                      : 'VanqisFresh',
                   style: GoogleFonts.inter(
                     color: Colors.white,
                     fontSize: 20,
@@ -217,40 +223,68 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
                 Text(
-                  'Sistem Pemesanan Cepat',
+                  authState.isAuthenticated
+                      ? '${authState.user?.phoneNumber}'
+                      : 'Sistem Pemesanan Cepat',
                   style: GoogleFonts.inter(
-                    color: Colors.white.withValues(alpha: 0.9),
+                    color: Colors.white.withOpacity(0.9),
                     fontSize: 12,
                   ),
                 ),
               ],
             ),
           ),
-          ListTile(
-            leading: const Icon(Icons.receipt_long_rounded, color: AppColors.textPrimary),
-            title: Text(
-              'Riwayat Pesanan',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+          
+          if (!authState.isAuthenticated) ...[
+            ListTile(
+              leading: const Icon(Icons.login_rounded, color: AppColors.textPrimary),
+              title: Text(
+                'Masuk / Daftar',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/login');
+              },
             ),
-            subtitle: Text(
-              'Pantau status pesananmu',
-              style: GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary),
+            const Divider(),
+          ],
+
+          if (authState.isAuthenticated) ...[
+            ListTile(
+              leading: const Icon(Icons.receipt_long_rounded, color: AppColors.textPrimary),
+              title: Text(
+                'Riwayat Pesanan',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+              },
             ),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.shopping_bag_outlined, color: AppColors.textPrimary),
-            title: Text(
-              'Keranjang Belanja',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.shopping_bag_outlined, color: AppColors.textPrimary),
+              title: Text(
+                'Keranjang Belanja',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+              },
             ),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout_rounded, color: AppColors.error),
+              title: Text(
+                'Keluar',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: AppColors.error),
+              ),
+              onTap: () async {
+                Navigator.pop(context);
+                await ref.read(authProvider.notifier).logout();
+              },
+            ),
+          ]
         ],
       ),
     );
