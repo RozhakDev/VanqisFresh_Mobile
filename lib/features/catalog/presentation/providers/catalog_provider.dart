@@ -13,6 +13,10 @@ final promosProvider = FutureProvider<List<Promo>>((ref) async {
   return ref.watch(catalogRepositoryProvider).getPromos();
 });
 
+final productDetailProvider = FutureProvider.family<Product, int>((ref, productId) async {
+  return ref.watch(catalogRepositoryProvider).getProductDetail(productId);
+});
+
 class ProductPaginationState {
   final List<Product> products;
   final bool isLoading;

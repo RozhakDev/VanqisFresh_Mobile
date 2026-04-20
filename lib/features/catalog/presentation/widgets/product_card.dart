@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
@@ -27,7 +28,7 @@ class ProductCard extends ConsumerWidget {
 
     return GestureDetector(
       onTap: () {
-        
+        context.push('/product/${product.id}');
       },
       child: Container(
         decoration: BoxDecoration(

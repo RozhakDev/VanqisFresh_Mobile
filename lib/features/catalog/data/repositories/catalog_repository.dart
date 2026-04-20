@@ -60,4 +60,15 @@ class CatalogRepository {
       throw ApiException(e.toString());
     }
   }
+
+  Future<Product> getProductDetail(int id) async {
+    try {
+      final response = await _dio.get('/catalog/products/$id/');
+      return Product.fromJson(response.data);
+    } on DioException catch (e) {
+      throw ApiException.fromDioError(e);
+    } catch (e) {
+      throw ApiException(e.toString());
+    }
+  }
 }
