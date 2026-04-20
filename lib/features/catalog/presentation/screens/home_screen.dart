@@ -252,6 +252,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
           if (authState.isAuthenticated) ...[
             ListTile(
+              leading: const Icon(Icons.person_rounded, color: AppColors.textPrimary),
+              title: Text(
+                'Profil & Akun',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/profile');
+              },
+            ),
+            const Divider(),
+            ListTile(
               leading: const Icon(Icons.receipt_long_rounded, color: AppColors.textPrimary),
               title: Text(
                 'Riwayat Pesanan',

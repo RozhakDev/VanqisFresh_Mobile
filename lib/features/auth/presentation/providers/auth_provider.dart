@@ -76,6 +76,18 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
+  Future<bool> updateProfile(Map<String, dynamic> data) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final updatedUser = await _repository.updateProfile(data);
+      state = state.copyWith(isLoading: false, user: updatedUser);
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString().replaceAll('Exception: ', ''));
+      return false;
+    }
+  }
+
   Future<void> logout() async {
     await _repository.clearTokens();
     state = const AuthState();

@@ -71,6 +71,20 @@ class AuthRepository {
     }
   }
 
+  Future<User> updateProfile(Map<String, dynamic> data) async {
+    try {
+      final response = await _dio.patch('/users/profile/', data: data);
+      return User.fromJson(response.data);
+    } on DioException catch (e) {
+      if (e.response != null && e.response!.data is Map) {
+        final err = e.response!.data as Map;
+        final errors = err.values.expand((v) => v is List ? v : [v]).join('\n');
+        throw Exception(errors.isNotEmpty ? errors : 'Gagal memperbarui profil');
+      }
+      throw Exception('Kesalahan jaringan: ${e.message}');
+    }
+  }
+
   Future<void> saveTokens(String access, String refresh) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('access_token', access);
