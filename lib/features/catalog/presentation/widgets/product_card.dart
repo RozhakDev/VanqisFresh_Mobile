@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../domain/models/product.dart';
+import '../../../orders/presentation/providers/cart_provider.dart';
 
 class ProductCard extends ConsumerWidget {
   final Product product;
@@ -235,8 +236,44 @@ class _AddToCartButtonState extends State<_AddToCartButton>
     await _animController.reverse();
 
     HapticFeedback.lightImpact();
+    
+    widget.ref.read(cartProvider.notifier).addItem(widget.product, 1);
 
     setState(() => _added = true);
+    
+    if (mounted) {
+      ScaffoldMessenger.of(widget.context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle_rounded, color: Colors.white, size: 16),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '${widget.product.name} (x1) masuk keranjang',
+                    style: GoogleFonts.inter(color: Colors.white, fontSize: 13),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            action: SnackBarAction(
+              label: 'CHECKOUT',
+              textColor: AppColors.primary,
+              onPressed: () {
+                widget.context.push('/checkout');
+              },
+            ),
+            duration: const Duration(seconds: 3),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          ),
+        );
+    }
+
     await Future.delayed(const Duration(milliseconds: 800));
     if (mounted) setState(() => _added = false);
   }

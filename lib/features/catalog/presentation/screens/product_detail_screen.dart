@@ -9,6 +9,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../domain/models/product.dart';
 import '../providers/catalog_provider.dart';
+import '../../../orders/presentation/providers/cart_provider.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
   final int productId;
@@ -51,6 +52,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
 
     HapticFeedback.mediumImpact();
 
+    ref.read(cartProvider.notifier).addItem(product, _quantity);
+
     if (mounted) {
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
@@ -62,14 +65,21 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    '${product.name} (x$_quantity) masuk keranjang (Mock)',
+                    '${product.name} (x$_quantity) masuk keranjang',
                     style: GoogleFonts.inter(color: Colors.white, fontSize: 13),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
-            duration: const Duration(seconds: 2),
+            action: SnackBarAction(
+              label: 'CHECKOUT',
+              textColor: AppColors.primary,
+              onPressed: () {
+                context.push('/checkout');
+              },
+            ),
+            duration: const Duration(seconds: 3),
             backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),

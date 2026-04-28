@@ -282,6 +282,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               onTap: () {
                 Navigator.pop(context);
+                context.push('/checkout');
               },
             ),
             const Divider(),

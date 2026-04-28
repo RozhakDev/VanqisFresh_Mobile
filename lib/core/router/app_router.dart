@@ -6,6 +6,8 @@ import '../../features/catalog/presentation/screens/product_detail_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/profile_screen.dart';
+import '../../features/orders/presentation/screens/checkout_screen.dart';
+import '../../features/orders/presentation/screens/payment_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -21,6 +23,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/profile',
         name: 'profile',
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/checkout',
+        name: 'checkout',
+        builder: (context, state) => const CheckoutScreen(),
+      ),
+      GoRoute(
+        path: '/payment/:publicId',
+        name: 'payment',
+        builder: (context, state) {
+          final publicId = state.pathParameters['publicId']!;
+          return PaymentScreen(publicId: publicId);
+        },
       ),
       GoRoute(
         path: '/product/:id',
