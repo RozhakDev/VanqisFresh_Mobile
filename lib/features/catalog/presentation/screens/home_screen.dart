@@ -271,6 +271,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               onTap: () {
                 Navigator.pop(context);
+                context.push('/orders');
               },
             ),
             const Divider(),

@@ -85,4 +85,34 @@ class OrderRepository {
       throw Exception('Gagal mengambil kontak WhatsApp: $e');
     }
   }
+
+  Future<Map<String, dynamic>> getOrders({int page = 1}) async {
+    try {
+      final response = await _dio.get(
+        '/orders/',
+        queryParameters: {'page': page},
+      );
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response != null && e.response!.data != null) {
+        throw Exception(e.response!.data.toString());
+      }
+      throw Exception('Kesalahan jaringan saat mengambil riwayat pesanan.');
+    }
+  }
+
+  Future<Map<String, dynamic>> getOrderDetail(String publicId) async {
+    try {
+      final response = await _dio.get('/orders/$publicId/');
+      return response.data;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        throw Exception('Pesanan tidak ditemukan.');
+      }
+      if (e.response != null && e.response!.data != null) {
+        throw Exception(e.response!.data.toString());
+      }
+      throw Exception('Kesalahan jaringan saat mengambil detail pesanan.');
+    }
+  }
 }

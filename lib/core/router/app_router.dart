@@ -8,6 +8,8 @@ import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/profile_screen.dart';
 import '../../features/orders/presentation/screens/checkout_screen.dart';
 import '../../features/orders/presentation/screens/payment_screen.dart';
+import '../../features/orders/presentation/screens/order_list_screen.dart';
+import '../../features/orders/presentation/screens/order_detail_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -35,6 +37,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final publicId = state.pathParameters['publicId']!;
           return PaymentScreen(publicId: publicId);
+        },
+      ),
+      GoRoute(
+        path: '/orders',
+        name: 'order_list',
+        builder: (context, state) => const OrderListScreen(),
+      ),
+      GoRoute(
+        path: '/orders/:publicId',
+        name: 'order_detail',
+        builder: (context, state) {
+          final publicId = state.pathParameters['publicId']!;
+          return OrderDetailScreen(publicId: publicId);
         },
       ),
       GoRoute(
