@@ -3,36 +3,41 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  static const Color primary = Color(0xFFFFE716);
-  static const Color primaryDark = Color(0xFFE6D014);
-  static const Color primaryLight = Color(0xFFFFF05B);
-  static const Color primaryMuted = Color(0xFFFFFAD6);
-  static const Color primarySurface = Color(0xFFFFFBEB);
+  static const Color primary = Color(0xFF16A34A); 
+  static const Color primaryDark = Color(0xFF15803D);
+  static const Color primaryLight = Color(0xFF4ADE80);
+  
+  static const Color brandYellow = Color(0xFFEAB308);
+  static const Color brandOrange = Color(0xFFF97316);
+  static const Color brandRed    = Color(0xFFEF4444);
 
-  static const Color background = Color(0xFFF5F5F0);
+  static const Color primaryMuted = Color(0xFFDCFCE7);
+  static const Color primarySurface = Color(0xFFF0FDF4);
+  static const Color accentGreen  = Color(0xFF16A34A);
+  static const Color accentRed    = Color(0xFFFF4038);
+  static const Color accentOrange = Color(0xFFEA580C);
+  static const Color accentPurple = Color(0xFF7C3AED);
+  static const Color accentBlue   = Color(0xFF2563EB);
+
+  static const Color background = Color(0xFFF4F7F5);
   static const Color surface    = Color(0xFFFFFFFF);
   static const Color border     = Color(0xFFE5E7EB);
   static const Color divider    = Color(0xFFE5E7EB);
+  static const Color section    = Color(0xFFF3F4F6);
 
-  static const Color textPrimary   = Color(0xFF1C1917);
-  static const Color textSecondary = Color(0xFF78716C);
-  static const Color textHint      = Color(0xFFA8A29E);
-  static const Color textOnPrimary = Color(0xFF1C1917);
+  static const Color textPrimary   = Color(0xFF134E4A);
+  static const Color textSecondary = Color(0xFF6B7280);
+  static const Color textHint      = Color(0xFF9CA3AF);
+  static const Color textOnPrimary = Color(0xFFFFFFFF);
 
-  static const Color accentGreen  = Color(0xFF16A34A);  
-  static const Color accentRed    = Color(0xFFFF4038);
-  static const Color accentOrange = Color(0xFFEA580C);  
-  static const Color accentPurple = Color(0xFF7C3AED);  
-  static const Color accentBlue   = Color(0xFF2563EB);  
-
-  static const Color error   = Color(0xFFFF4038);
-  static const Color success = Color(0xFF16A34A);
-  static const Color warning = Color(0xFFEA580C);
-  static const Color info    = Color(0xFF2563EB);
+  static const Color error   = Color(0xFFEF4444);
+  static const Color success = Color(0xFF22C55E);
+  static const Color warning = Color(0xFFFACC15);
+  static const Color info    = Color(0xFF3B82F6);
 
   static List<BoxShadow> get cardShadow => [
     BoxShadow(
-      color: const Color(0xFF1C1917).withValues(alpha: 0.07),
+      color: const Color(0xFF134E4A).withValues(alpha: 0.04),
       blurRadius: 14,
       offset: const Offset(0, 4),
     ),
@@ -40,7 +45,7 @@ class AppColors {
 
   static List<BoxShadow> get softShadow => [
     BoxShadow(
-      color: const Color(0xFF1C1917).withValues(alpha: 0.05),
+      color: const Color(0xFF134E4A).withValues(alpha: 0.03),
       blurRadius: 8,
       offset: const Offset(0, 2),
     ),
@@ -48,7 +53,7 @@ class AppColors {
 
   static List<BoxShadow> get bottomBarShadow => [
     BoxShadow(
-      color: const Color(0xFF1C1917).withValues(alpha: 0.09),
+      color: const Color(0xFF134E4A).withValues(alpha: 0.06),
       blurRadius: 16,
       offset: const Offset(0, -4),
     ),
@@ -56,9 +61,9 @@ class AppColors {
 
   static List<BoxShadow> get primaryGlow => [
     BoxShadow(
-      color: primary.withValues(alpha: 0.35),
-      blurRadius: 14,
-      offset: const Offset(0, 5),
+      color: primary.withValues(alpha: 0.25),
+      blurRadius: 12,
+      offset: const Offset(0, 4),
     ),
   ];
 }

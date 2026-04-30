@@ -57,7 +57,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 'Email belum diverifikasi. Mengalihkan ke halaman OTP...', 
                 style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600)
               ),
-              backgroundColor: AppColors.accentOrange,
+              backgroundColor: AppColors.warning,
             ),
           );
           context.go('/verify-email?email=$unverifiedEmail');
@@ -84,31 +84,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
             child: Form(
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      width: 64,
-                      height: 64,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.eco_rounded,
-                        color: AppColors.textOnPrimary,
-                        size: 36,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  
                   Text(
                     'Selamat Datang di\nVanqisFresh',
                     style: GoogleFonts.inter(
@@ -121,22 +103,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Masuk untuk melanjutkan pengalaman belanja segar dan aman Anda hari ini.',
+                    'Silakan masuk ke akun Anda untuk mulai berbelanja.',
                     style: GoogleFonts.inter(
-                      fontSize: 14,
+                      fontSize: 15,
                       color: AppColors.textSecondary,
                       height: 1.5,
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 48),
 
-                  _buildLabel('Email'),
+                  _buildLabel('Alamat Email'),
                   TextFormField(
                     controller: _emailCtrl,
                     keyboardType: TextInputType.emailAddress,
+                    style: GoogleFonts.inter(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
                     decoration: const InputDecoration(
-                      hintText: 'rozhak@rozhak.xyz',
-                      prefixIcon: Icon(Icons.email_outlined, color: AppColors.textHint, size: 20),
+                      hintText: 'user@vanqisfresh.com',
+                      prefixIcon: Icon(Icons.email_outlined, color: AppColors.textHint, size: 22),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) return 'Email wajib diisi';
@@ -144,20 +127,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
 
                   _buildLabel('Kata Sandi'),
                   TextFormField(
                     controller: _passwordCtrl,
                     obscureText: _obscurePassword,
+                    style: GoogleFonts.inter(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
                     decoration: InputDecoration(
                       hintText: '••••••••',
-                      prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.textHint, size: 20),
+                      prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.textHint, size: 22),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
                           color: AppColors.textHint,
-                          size: 20,
+                          size: 22,
                         ),
                         onPressed: () {
                           setState(() => _obscurePassword = !_obscurePassword);
@@ -170,25 +154,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     },
                   ),
                   
+                  const SizedBox(height: 12),
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () {},
                       style: TextButton.styleFrom(
-                        foregroundColor: AppColors.textSecondary,
+                        foregroundColor: AppColors.primary,
                         padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                       child: Text(
                         'Lupa Kata Sandi?',
                         style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ),
                   
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
 
                   ElevatedButton(
                     onPressed: authState.isLoading ? null : _onLogin,
@@ -196,17 +183,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       backgroundColor: AppColors.primary,
                       foregroundColor: AppColors.textOnPrimary,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     child: authState.isLoading
                         ? const SizedBox(
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(
-                              color: AppColors.textPrimary,
+                              color: AppColors.textOnPrimary,
                               strokeWidth: 2,
                             ),
                           )
-                        : const Text('Masuk Sekarang'),
+                        : Text(
+                            'Masuk Sekarang',
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                   ),
                   
                   const SizedBox(height: 32),
@@ -216,15 +213,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     children: [
                       Text(
                         'Belum punya akun? ',
-                        style: GoogleFonts.inter(color: AppColors.textSecondary),
+                        style: GoogleFonts.inter(
+                          color: AppColors.textSecondary,
+                          fontSize: 14,
+                        ),
                       ),
                       GestureDetector(
                         onTap: () => context.go('/register'),
                         child: Text(
-                          'Daftar',
+                          'Daftar di sini',
                           style: GoogleFonts.inter(
-                            color: AppColors.primaryDark,
+                            color: AppColors.primary,
                             fontWeight: FontWeight.w700,
+                            fontSize: 14,
                           ),
                         ),
                       ),
@@ -241,11 +242,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Widget _buildLabel(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6, left: 4),
+      padding: const EdgeInsets.only(bottom: 8, left: 4),
       child: Text(
         text,
         style: GoogleFonts.inter(
-          fontSize: 13,
+          fontSize: 14,
           fontWeight: FontWeight.w600,
           color: AppColors.textPrimary,
         ),

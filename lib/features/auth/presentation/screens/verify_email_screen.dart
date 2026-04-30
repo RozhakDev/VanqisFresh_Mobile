@@ -28,6 +28,9 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   void initState() {
     super.initState();
     _startTimer();
+    _otpController.addListener(() {
+      setState(() {});
+    });
   }
 
   @override
@@ -112,7 +115,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
-          onPressed: () => context.pop(),
+          onPressed: () => context.go('/login'),
         ),
       ),
       body: SafeArea(
@@ -141,32 +144,87 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
               ),
               const SizedBox(height: 40),
 
-              TextField(
-                controller: _otpController,
-                keyboardType: TextInputType.number,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(fontSize: 24, letterSpacing: 8, fontWeight: FontWeight.w700),
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(6),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: List.generate(6, (index) {
+                      final text = _otpController.text;
+                      final isFilled = index < text.length;
+                      final isFocused = index == text.length;
+                      
+                      return Container(
+                        width: 48,
+                        height: 56,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isFocused ? AppColors.primary : (isFilled ? AppColors.primary.withValues(alpha: 0.5) : AppColors.border),
+                            width: isFocused ? 2 : 1,
+                          ),
+                          boxShadow: isFocused ? AppColors.softShadow : [],
+                        ),
+                        child: Text(
+                          isFilled ? text[index] : '',
+                          style: GoogleFonts.inter(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                  TextField(
+                    controller: _otpController,
+                    keyboardType: TextInputType.number,
+                    maxLength: 6,
+                    cursorColor: Colors.transparent,
+                    enableInteractiveSelection: false,
+                    style: const TextStyle(color: Colors.transparent, fontSize: 24),
+                    decoration: const InputDecoration(
+                      counterText: '',
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      errorBorder: InputBorder.none,
+                      disabledBorder: InputBorder.none,
+                      fillColor: Colors.transparent,
+                      filled: true,
+                    ),
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  ),
                 ],
-                decoration: InputDecoration(
-                  hintText: '000000',
-                  hintStyle: GoogleFonts.inter(fontSize: 24, letterSpacing: 8, color: AppColors.textHint),
-                  filled: true,
-                  fillColor: AppColors.surface,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 20),
-                ),
               ),
               const SizedBox(height: 32),
 
               ElevatedButton(
-                onPressed: _isLoading ? null : _verifyOtp,
-                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+                onPressed: _isLoading || _otpController.text.length < 6 ? null : _verifyOtp,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: AppColors.textOnPrimary,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
                 child: _isLoading
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : const Text('Verifikasi Sekarang'),
+                    ? const SizedBox(
+                        height: 20, 
+                        width: 20, 
+                        child: CircularProgressIndicator(color: AppColors.textOnPrimary, strokeWidth: 2)
+                      )
+                    : Text(
+                        'Verifikasi Sekarang',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
               ),
               const SizedBox(height: 24),
 

@@ -95,12 +95,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
-          onPressed: () => context.pop(),
+          onPressed: () => context.go('/login'),
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
           child: Form(
             key: _formKey,
             child: Column(
@@ -129,7 +129,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 _buildLabel('Username (Unik)'),
                 TextFormField(
                   controller: _usernameCtrl,
-                  decoration: const InputDecoration(hintText: 'rozhak_official'),
+                  style: GoogleFonts.inter(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
+                  decoration: const InputDecoration(
+                    hintText: 'vanqis.fresh',
+                    prefixIcon: Icon(Icons.person_outline_rounded, color: AppColors.textHint, size: 22),
+                  ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) return 'Username wajib diisi';
                     if (value.trim().length < 4) return 'Username minimal 4 karakter';
@@ -147,7 +151,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           _buildLabel('Nama Depan'),
                           TextFormField(
                             controller: _firstNameCtrl,
-                            decoration: const InputDecoration(hintText: 'Rozhak'),
+                            style: GoogleFonts.inter(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
+                            decoration: const InputDecoration(hintText: 'Vanqis'),
                             validator: (value) => value == null || value.trim().isEmpty 
                                 ? 'Wajib diisi' : null,
                           ),
@@ -162,7 +167,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           _buildLabel('Nama Belakang'),
                           TextFormField(
                             controller: _lastNameCtrl,
-                            decoration: const InputDecoration(hintText: 'Dev'),
+                            style: GoogleFonts.inter(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
+                            decoration: const InputDecoration(hintText: 'Fresh'),
                             validator: (value) => value == null || value.trim().isEmpty 
                                 ? 'Wajib diisi' : null,
                           ),
@@ -177,9 +183,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 TextFormField(
                   controller: _phoneCtrl,
                   keyboardType: TextInputType.phone,
+                  style: GoogleFonts.inter(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
                   decoration: const InputDecoration(
-                    hintText: '083847921480',
-                    prefixIcon: Icon(Icons.phone_android_rounded, color: AppColors.textHint, size: 20),
+                    hintText: '08xxxxxxxx',
+                    prefixIcon: Icon(Icons.phone_android_rounded, color: AppColors.textHint, size: 22),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) return 'Nomor HP wajib diisi';
@@ -191,13 +198,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                _buildLabel('Email'),
+                _buildLabel('Alamat Email'),
                 TextFormField(
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
+                  style: GoogleFonts.inter(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
                   decoration: const InputDecoration(
-                    hintText: 'rozhak@rozhak.xyz',
-                    prefixIcon: Icon(Icons.email_outlined, color: AppColors.textHint, size: 20),
+                    hintText: 'user@vanqisfresh.com',
+                    prefixIcon: Icon(Icons.email_outlined, color: AppColors.textHint, size: 22),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) return 'Email wajib diisi';
@@ -211,14 +219,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 TextFormField(
                   controller: _passwordCtrl,
                   obscureText: _obscurePassword,
+                  style: GoogleFonts.inter(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
                   decoration: InputDecoration(
                     hintText: 'Minimal 6 karakter',
-                    prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.textHint, size: 20),
+                    prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.textHint, size: 22),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
                         color: AppColors.textHint,
-                        size: 20,
+                        size: 22,
                       ),
                       onPressed: () {
                         setState(() => _obscurePassword = !_obscurePassword);
@@ -237,8 +246,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 TextFormField(
                   controller: _addressCtrl,
                   maxLines: 3,
+                  style: GoogleFonts.inter(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
                   decoration: const InputDecoration(
-                    hintText: 'Detail jalan, RT/RW, Kecamatan, dsb.',
+                    hintText: 'Contoh: Jl. Dipayuda No. 1, RT 01/RW 02, Banjarnegara',
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) return 'Alamat wajib diisi';
@@ -252,17 +262,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   onPressed: authState.isLoading ? null : _onRegister,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.textOnPrimary,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   child: authState.isLoading
                       ? const SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
-                            color: AppColors.textPrimary,
+                            color: AppColors.textOnPrimary,
                             strokeWidth: 2,
                           ),
                         )
-                      : const Text('Daftar Sekarang'),
+                      : Text(
+                          'Daftar Sekarang',
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                 ),
                 const SizedBox(height: 24),
 
@@ -276,10 +298,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     GestureDetector(
                       onTap: () => context.go('/login'),
                       child: Text(
-                        'Masuk',
+                        'Masuk di sini',
                         style: GoogleFonts.inter(
-                          color: AppColors.primaryDark,
+                          color: AppColors.primary,
                           fontWeight: FontWeight.w700,
+                          fontSize: 14,
                         ),
                       ),
                     ),
@@ -296,11 +319,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Widget _buildLabel(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6, left: 4),
+      padding: const EdgeInsets.only(bottom: 8, left: 4),
       child: Text(
         text,
         style: GoogleFonts.inter(
-          fontSize: 13,
+          fontSize: 14,
           fontWeight: FontWeight.w600,
           color: AppColors.textPrimary,
         ),
