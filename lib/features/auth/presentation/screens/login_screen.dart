@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -35,16 +36,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final message = GoRouterState.of(context).uri.queryParameters['message'];
     if (message != null && message.isNotEmpty) {
       _messageShown = true;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            message,
-            style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600),
-          ),
-          backgroundColor: AppColors.info,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      SnackbarUtils.show(context, message, type: SnackbarType.info);
     }
   }
 
@@ -68,6 +60,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!mounted) return;
 
     if (success) {
+      SnackbarUtils.show(context, 'Login berhasil!', type: SnackbarType.success);
       context.go('/'); 
     }
   }
@@ -79,28 +72,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         if (next.error!.startsWith('UNVERIFIED:')) {
           final unverifiedEmail = next.error!.split(':')[1];
           ref.read(authProvider.notifier).clearError();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Email belum diverifikasi. Mengalihkan ke halaman OTP...', 
-                style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600)
-              ),
-              backgroundColor: AppColors.warning,
-            ),
-          );
+          SnackbarUtils.show(context, 'Email belum diverifikasi. Mengalihkan ke halaman OTP...', type: SnackbarType.warning);
           context.go('/verify-email?email=$unverifiedEmail');
           return;
         }
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              next.error!, 
-              style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600)
-            ),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        SnackbarUtils.show(context, next.error!, type: SnackbarType.error);
         ref.read(authProvider.notifier).clearError();
       }
     });

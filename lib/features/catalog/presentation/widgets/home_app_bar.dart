@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 
 class HomeAppBar extends StatelessWidget {
   final int cartTotalItems;
@@ -73,15 +74,11 @@ class HomeAppBar extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Belum ada notifikasi baru', style: GoogleFonts.inter()),
-                      backgroundColor: AppColors.textPrimary,
-                      duration: const Duration(seconds: 2),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                    ),
+                  SnackbarUtils.show(
+                    context, 
+                    'Belum ada notifikasi baru', 
+                    type: SnackbarType.info, 
+                    duration: const Duration(seconds: 2),
                   );
                 },
                 child: Container(

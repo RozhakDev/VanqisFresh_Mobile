@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../providers/auth_provider.dart';
 import '../../data/repositories/auth_repository.dart';
 
@@ -54,9 +55,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   Future<void> _verifyOtp() async {
     final otp = _otpController.text.trim();
     if (otp.length < 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Kode OTP tidak lengkap'), backgroundColor: AppColors.error),
-      );
+      SnackbarUtils.show(context, 'Kode OTP tidak lengkap', type: SnackbarType.error);
       return;
     }
 
@@ -65,18 +64,11 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     try {
       await ref.read(authRepositoryProvider).verifyEmail(widget.email, otp);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Verifikasi Berhasil! Silakan Login.', style: GoogleFonts.inter(color: Colors.white)),
-          backgroundColor: AppColors.success,
-        ),
-      );
+      SnackbarUtils.show(context, 'Verifikasi Berhasil! Silakan Login.', type: SnackbarType.success);
       context.go('/login');
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')), backgroundColor: AppColors.error),
-      );
+      SnackbarUtils.show(context, e.toString().replaceAll('Exception: ', ''), type: SnackbarType.error);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -89,18 +81,11 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     try {
       await ref.read(authRepositoryProvider).resendOtp(widget.email);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Kode OTP telah dikirim ulang ke ${widget.email}', style: GoogleFonts.inter(color: Colors.white)),
-          backgroundColor: AppColors.success,
-        ),
-      );
+      SnackbarUtils.show(context, 'Kode OTP telah dikirim ulang ke ${widget.email}', type: SnackbarType.success);
       _startTimer();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')), backgroundColor: AppColors.error),
-      );
+      SnackbarUtils.show(context, e.toString().replaceAll('Exception: ', ''), type: SnackbarType.error);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

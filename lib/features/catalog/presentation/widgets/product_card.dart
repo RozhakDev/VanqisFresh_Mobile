@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../domain/models/product.dart';
 import '../../../orders/presentation/providers/cart_provider.dart';
 
@@ -201,39 +202,19 @@ class _AddToCartButtonState extends State<_AddToCartButton>
     setState(() => _added = true);
     
     if (mounted) {
-      ScaffoldMessenger.of(widget.context)
-        ..clearSnackBars()
-        ..showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    '${widget.product.name} masuk keranjang',
-                    style: GoogleFonts.inter(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-            action: SnackBarAction(
-              label: 'LIHAT',
-              textColor: AppColors.primaryLight,
-              onPressed: () {
-                widget.context.push('/checkout');
-              },
-            ),
-            duration: const Duration(seconds: 2),
-            backgroundColor: AppColors.textPrimary,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-          ),
-        );
+      SnackbarUtils.show(
+        widget.context,
+        '${widget.product.name} masuk keranjang',
+        type: SnackbarType.success,
+        duration: const Duration(seconds: 2),
+        action: SnackBarAction(
+          label: 'LIHAT',
+          textColor: Colors.white,
+          onPressed: () {
+            widget.context.push('/checkout');
+          },
+        ),
+      );
     }
 
     await Future.delayed(const Duration(milliseconds: 800));

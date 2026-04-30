@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../providers/auth_provider.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -62,21 +63,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (!mounted) return;
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Profil berhasil diperbarui!',
-            style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600),
-          ),
-          backgroundColor: AppColors.success,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      SnackbarUtils.show(context, 'Profil berhasil diperbarui!', type: SnackbarType.success);
     }
   }
 
   void _onLogout() {
     ref.read(authProvider.notifier).logout();
+    SnackbarUtils.show(context, 'Berhasil keluar', type: SnackbarType.success);
     context.go('/login');
   }
 
@@ -84,15 +77,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget build(BuildContext context) {
     ref.listen(authProvider, (previous, next) {
       if (next.error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              next.error!, 
-              style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600)
-            ),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        SnackbarUtils.show(context, next.error!, type: SnackbarType.error);
         ref.read(authProvider.notifier).clearError();
       }
 

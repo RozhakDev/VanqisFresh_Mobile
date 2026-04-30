@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../domain/models/product.dart';
 import '../providers/catalog_provider.dart';
 import '../../../orders/presentation/providers/cart_provider.dart';
@@ -55,36 +56,19 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
     ref.read(cartProvider.notifier).addItem(product, _quantity);
 
     if (mounted) {
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle_rounded, color: Colors.white, size: 16),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    '${product.name} (x$_quantity) masuk keranjang',
-                    style: GoogleFonts.inter(color: Colors.white, fontSize: 13),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-            action: SnackBarAction(
-              label: 'CHECKOUT',
-              textColor: AppColors.primary,
-              onPressed: () {
-                context.push('/checkout');
-              },
-            ),
-            duration: const Duration(seconds: 3),
-            backgroundColor: AppColors.success,
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          ),
-        );
+      SnackbarUtils.show(
+        context,
+        '${product.name} masuk keranjang',
+        type: SnackbarType.success,
+        duration: const Duration(seconds: 2),
+        action: SnackBarAction(
+          label: 'LIHAT',
+          textColor: AppColors.primaryLight,
+          onPressed: () {
+            context.push('/checkout');
+          },
+        ),
+      );
     }
   }
 

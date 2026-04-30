@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../data/repositories/order_repository.dart';
 
 final paymentMethodsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
@@ -45,22 +46,12 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
       await ref.read(orderRepositoryProvider).uploadPaymentProof(widget.publicId, _selectedImage!.path);
       
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Pembayaran berhasil dikonfirmasi!', style: GoogleFonts.inter(color: Colors.white)),
-          backgroundColor: AppColors.success,
-        ),
-      );
+      SnackbarUtils.show(context, 'Pembayaran berhasil dikonfirmasi!', type: SnackbarType.success);
       
       context.go('/');
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', ''), style: GoogleFonts.inter(color: Colors.white)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      SnackbarUtils.show(context, e.toString().replaceAll('Exception: ', ''), type: SnackbarType.error);
     } finally {
       if (mounted) setState(() => _isUploading = false);
     }

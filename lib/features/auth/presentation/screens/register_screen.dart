@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../providers/auth_provider.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -55,15 +56,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!mounted) return;
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Registrasi berhasil! Silakan verifikasi email Anda.',
-            style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600),
-          ),
-          backgroundColor: AppColors.success,
-        ),
-      );
+      SnackbarUtils.show(context, 'Registrasi berhasil! Silakan verifikasi email Anda.', type: SnackbarType.success);
       final registeredEmail = _emailCtrl.text.trim();
       context.go('/verify-email?email=$registeredEmail');
     }
@@ -73,15 +66,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     ref.listen(authProvider, (previous, next) {
       if (next.error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              next.error!, 
-              style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600)
-            ),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        SnackbarUtils.show(context, next.error!, type: SnackbarType.error);
         ref.read(authProvider.notifier).clearError();
       }
     });

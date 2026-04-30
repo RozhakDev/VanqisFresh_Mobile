@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/snackbar_utils.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/repositories/order_repository.dart';
 import '../providers/cart_provider.dart';
@@ -46,12 +47,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       ref.read(cartProvider.notifier).clearCart();
       
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Pesanan berhasil dibuat!', style: GoogleFonts.inter(color: Colors.white)),
-          backgroundColor: AppColors.success,
-        ),
-      );
+      SnackbarUtils.show(context, 'Pesanan berhasil dibuat!', type: SnackbarType.success);
       
       final publicId = response['public_id'];
       if (publicId != null) {
@@ -61,12 +57,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', ''), style: GoogleFonts.inter(color: Colors.white)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      SnackbarUtils.show(context, e.toString().replaceAll('Exception: ', ''), type: SnackbarType.error);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -78,9 +69,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
     final user = ref.read(authProvider).user;
     if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sesi telah habis, silakan login ulang.'), backgroundColor: AppColors.error),
-      );
+      SnackbarUtils.show(context, 'Sesi telah habis, silakan login ulang.', type: SnackbarType.error);
       return;
     }
 
@@ -116,12 +105,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       if (mounted) context.go('/');
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', ''), style: GoogleFonts.inter(color: Colors.white)),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      SnackbarUtils.show(context, e.toString().replaceAll('Exception: ', ''), type: SnackbarType.error);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -175,7 +159,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryMuted.withOpacity(0.5),
+                  color: AppColors.primaryMuted.withValues(alpha: 0.5),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.shopping_cart_outlined, size: 64, color: AppColors.primary),
