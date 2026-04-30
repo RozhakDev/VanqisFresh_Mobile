@@ -69,7 +69,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       child: Scaffold(
         backgroundColor: AppColors.background,
-        drawer: _buildDrawer(context),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: 0,
+          onTap: (index) {
+            if (index == 1) context.push('/orders');
+            if (index == 2) context.push('/checkout');
+            if (index == 3) context.push('/profile');
+          },
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          selectedItemColor: AppColors.primary,
+          unselectedItemColor: AppColors.textHint,
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          selectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700),
+          unselectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w500),
+          elevation: 20,
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Beranda'),
+            BottomNavigationBarItem(icon: Icon(Icons.receipt_long_rounded), label: 'Pesanan'),
+            BottomNavigationBarItem(icon: Icon(Icons.shopping_cart_outlined), label: 'Keranjang'),
+            BottomNavigationBarItem(icon: Icon(Icons.person_outline_rounded), label: 'Profil'),
+          ],
+        ),
         body: RefreshIndicator(
           onRefresh: () async =>
               ref.read(productsProvider.notifier).fetchInitialProducts(),
@@ -180,126 +202,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildDrawer(BuildContext context) {
-    final authState = ref.watch(authProvider);
-
-    return Drawer(
-      backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          DrawerHeader(
-            decoration: const BoxDecoration(
-              color: AppColors.primary,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.eco_rounded, color: AppColors.primary, size: 36),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  authState.isAuthenticated 
-                      ? 'Halo, ${authState.user?.firstName ?? "User"}!' 
-                      : 'VanqisFresh',
-                  style: GoogleFonts.inter(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                Text(
-                  authState.isAuthenticated
-                      ? '${authState.user?.phoneNumber}'
-                      : 'Sistem Pemesanan Cepat',
-                  style: GoogleFonts.inter(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          if (!authState.isAuthenticated) ...[
-            ListTile(
-              leading: const Icon(Icons.login_rounded, color: AppColors.textPrimary),
-              title: Text(
-                'Masuk / Daftar',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                context.push('/login');
-              },
-            ),
-            const Divider(),
-          ],
-
-          if (authState.isAuthenticated) ...[
-            ListTile(
-              leading: const Icon(Icons.person_rounded, color: AppColors.textPrimary),
-              title: Text(
-                'Profil & Akun',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                context.push('/profile');
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.receipt_long_rounded, color: AppColors.textPrimary),
-              title: Text(
-                'Riwayat Pesanan',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                context.push('/orders');
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.shopping_bag_outlined, color: AppColors.textPrimary),
-              title: Text(
-                'Keranjang Belanja',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                context.push('/checkout');
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.logout_rounded, color: AppColors.error),
-              title: Text(
-                'Keluar',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600, color: AppColors.error),
-              ),
-              onTap: () async {
-                Navigator.pop(context);
-                await ref.read(authProvider.notifier).logout();
-              },
-            ),
-          ]
-        ],
       ),
     );
   }

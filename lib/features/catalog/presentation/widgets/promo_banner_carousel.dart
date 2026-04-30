@@ -52,9 +52,9 @@ class _PromoCarouselWidgetState extends State<_PromoCarouselWidget> {
   Timer? _autoScrollTimer;
 
   static const List<List<Color>> _gradients = [
-    [Color(0xFFF59E0B), Color(0xFFFBBF24)],
-    [Color(0xFFEA580C), Color(0xFFF97316)],
-    [Color(0xFFD97706), Color(0xFFF59E0B)],
+    [Color(0xFF16A34A), Color(0xFF22C55E)],
+    [Color(0xFF047857), Color(0xFF10B981)],
+    [Color(0xFF0284C7), Color(0xFF0EA5E9)],
   ];
 
   @override
@@ -122,9 +122,8 @@ class _PromoCarouselWidgetState extends State<_PromoCarouselWidget> {
               ),
             ),
           ),
+          const SizedBox(height: 12),
         ],
-
-        _PromoProductsSection(promos: widget.promos),
       ],
     );
   }
@@ -150,9 +149,9 @@ class _PromoBannerCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: gradient[0].withOpacity(0.3),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -295,154 +294,6 @@ class _DotIndicator extends StatelessWidget {
         borderRadius: BorderRadius.circular(3),
       ),
     );
-  }
-}
-
-class _PromoProductsSection extends ConsumerWidget {
-  final List<Promo> promos;
-
-  const _PromoProductsSection({required this.promos});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final promosWithProducts =
-        promos.where((p) => p.products.isNotEmpty).toList();
-    if (promosWithProducts.isEmpty) return const SizedBox.shrink();
-
-    return Column(
-      children: promosWithProducts.map((promo) {
-        return _SinglePromoRow(promo: promo);
-      }).toList(),
-    );
-  }
-}
-
-class _SinglePromoRow extends StatelessWidget {
-  final Promo promo;
-
-  const _SinglePromoRow({required this.promo});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SectionHeader(
-          padding: const EdgeInsets.fromLTRB(16, 20, 16, 10),
-          title: promo.title,
-          subtitle: promo.description.isNotEmpty ? promo.description : null,
-        ),
-        SizedBox(
-          height: 220,
-          child: promo.products.length <= 2
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: promo.products.map((product) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                      child: SizedBox(
-                        width: 148,
-                        child: _PromoProductMiniCard(product: product),
-                      ),
-                    );
-                  }).toList(),
-                )
-              : ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: promo.products.length,
-                  itemBuilder: (context, index) {
-                    final product = promo.products[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: SizedBox(
-                        width: 148,
-                        child: _PromoProductMiniCard(product: product),
-                      ),
-                    );
-                  },
-                ),
-        ),
-      ],
-    );
-  }
-}
-
-class _PromoProductMiniCard extends StatelessWidget {
-  final dynamic product;
-
-  const _PromoProductMiniCard({required this.product});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: AppColors.softShadow,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
-              child: CachedNetworkImage(
-                imageUrl: product.image,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                placeholder: (_, __) => Container(color: const Color(0xFFF3F4F6)),
-                errorWidget: (_, __, ___) => Container(
-                  color: const Color(0xFFF3F4F6),
-                  child: const Icon(Icons.eco_rounded, color: AppColors.textHint, size: 32),
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  _formatRupiah(product.price),
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatRupiah(dynamic price) {
-    try {
-      final num amount = price is num ? price : num.parse(price.toString());
-      final intAmount = amount.toInt();
-      final formatted = intAmount.toString().replaceAllMapped(
-        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-        (m) => '${m[1]}.',
-      );
-      return 'Rp $formatted';
-    } catch (_) {
-      return 'Rp -';
-    }
   }
 }
 

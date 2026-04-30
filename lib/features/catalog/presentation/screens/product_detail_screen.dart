@@ -169,40 +169,24 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                               : _buildPlaceholder(),
                         ),
                       ),
-                      Positioned.fill(
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.black.withOpacity(0.2),
-                                Colors.transparent,
-                                AppColors.surface.withOpacity(0.9),
-                              ],
-                              stops: const [0.0, 0.5, 1.0],
-                            ),
-                          ),
-                        ),
-                      ),
+
                       if (!isAvailable)
                         Positioned.fill(
                           child: Container(
-                            color: Colors.black.withOpacity(0.5),
+                            color: Colors.black.withValues(alpha: 0.5),
                             child: Center(
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                 decoration: BoxDecoration(
-                                  color: AppColors.error,
-                                  borderRadius: BorderRadius.circular(12),
+                                  color: Colors.white.withValues(alpha: 0.95),
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
-                                  'STOK HABIS',
+                                  'Stok Habis',
                                   style: GoogleFonts.inter(
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 16,
-                                    color: Colors.white,
-                                    letterSpacing: 1.2,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                    color: AppColors.textPrimary,
                                   ),
                                 ),
                               ),
@@ -241,14 +225,18 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                           ),
                           Row(
                             children: [
-                              const Icon(Icons.star_rounded, color: AppColors.accentOrange, size: 16),
+                              Icon(
+                                isAvailable ? Icons.inventory_2_rounded : Icons.info_outline_rounded, 
+                                color: isAvailable ? AppColors.textSecondary : AppColors.error, 
+                                size: 16
+                              ),
                               const SizedBox(width: 4),
                               Text(
-                                '4.9 (120+)',
+                                isAvailable ? 'Sisa ${product.stock}' : 'Stok Habis',
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.textSecondary,
+                                  color: isAvailable ? AppColors.textSecondary : AppColors.error,
                                 ),
                               ),
                             ],
@@ -283,7 +271,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                           Padding(
                             padding: const EdgeInsets.only(bottom: 4),
                             child: Text(
-                              '/ porsi',
+                              '/ per ${product.unit}',
                               style: GoogleFonts.inter(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -316,18 +304,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                           color: AppColors.textSecondary,
                           height: 1.6,
                         ),
-                      ),
-                      
-                      const SizedBox(height: 32),
-                      
-                      Row(
-                        children: [
-                          _buildHighlightItem(Icons.verified_rounded, 'Kualitas Terjamin', AppColors.primaryDark),
-                          const SizedBox(width: 16),
-                          _buildHighlightItem(Icons.local_shipping_rounded, 'Dikirim Segar', AppColors.accentBlue),
-                          const SizedBox(width: 16),
-                          _buildHighlightItem(Icons.eco_rounded, 'Pilihan Organik', AppColors.success),
-                        ],
                       ),
                     ],
                   ),
@@ -422,8 +398,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
   }
 
   Widget _buildPlaceholder() {
-    return const Center(
-      child: Icon(Icons.eco_rounded, size: 80, color: AppColors.textHint),
+    return Container(
+      color: AppColors.border,
+      child: const Center(
+        child: Icon(Icons.shopping_cart_rounded, size: 80, color: AppColors.textHint),
+      ),
     );
   }
 
@@ -440,33 +419,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
           size: 20,
           color: enabled ? AppColors.textPrimary : AppColors.textHint,
         ),
-      ),
-    );
-  }
-
-  Widget _buildHighlightItem(IconData icon, String text, Color color) {
-    return Expanded(
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            text,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
-            ),
-          ),
-        ],
       ),
     );
   }

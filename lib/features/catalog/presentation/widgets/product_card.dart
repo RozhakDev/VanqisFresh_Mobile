@@ -19,14 +19,6 @@ class ProductCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isAvailable = product.isAvailable && product.stock > 0;
 
-    String unitText = 'per satuan';
-    final catName = product.categoryName.toLowerCase();
-    if (catName.contains('sayur')) {
-      unitText = 'per ikat';
-    } else if (catName.contains('buah')) {
-      unitText = 'per kilogram';
-    }
-
     return GestureDetector(
       onTap: () {
         context.push('/product/${product.id}');
@@ -34,152 +26,119 @@ class ProductCard extends ConsumerWidget {
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            )
-          ],
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: AppColors.softShadow,
         ),
-        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (isAvailable && product.stock <= 5)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEF4444),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      'Best sale',
-                      style: GoogleFonts.inter(
-                        fontSize: 9,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  )
-                else if (isAvailable && product.price > 50000)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF3B82F6),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      '20% Off',
-                      style: GoogleFonts.inter(
-                        fontSize: 9,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  )
-                else
-                  const SizedBox(width: 40),
-
-                Icon(
-                  Icons.favorite_border_rounded,
-                  color: AppColors.textHint,
-                  size: 18,
-                ),
-              ],
-            ),
-
             Expanded(
-              child: Center(
-                child: Hero(
-                  tag: 'product_${product.id}',
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      CachedNetworkImage(
+              child: Hero(
+                tag: 'product_${product.id}',
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    ClipRRect(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                      child: CachedNetworkImage(
                         imageUrl: product.image,
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.contain,
-                        placeholder: (context, url) =>
-                            const CircularProgressIndicator(strokeWidth: 2),
-                        errorWidget: (context, url, error) => const Icon(
-                          Icons.eco_rounded,
-                          color: AppColors.textHint,
-                          size: 40,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          color: AppColors.border,
+                          child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: AppColors.border,
+                          child: const Center(
+                            child: Icon(
+                              Icons.shopping_cart_rounded,
+                              color: AppColors.textHint,
+                              size: 48,
+                            ),
+                          ),
                         ),
                       ),
-                      if (!isAvailable)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.6),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
+                    ),
+                    if (!isAvailable)
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.6),
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                        ),
+                        child: Center(
                           child: Text(
-                            'Sold Out',
+                            'Habis',
                             style: GoogleFonts.inter(
                               color: Colors.white,
-                              fontSize: 10,
+                              fontSize: 14,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
+                      ),
+                    const Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Icon(
+                        Icons.favorite_border_rounded,
+                        color: Colors.white,
+                        size: 20,
+                        shadows: [Shadow(color: Colors.black45, blurRadius: 4)],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'per ${product.unit}',
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: AppColors.textHint,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          CurrencyFormat.convertToIdr(product.price),
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                            color: AppColors.primary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      _AddToCartButton(
+                        product: product,
+                        isAvailable: isAvailable,
+                        ref: ref,
+                        context: context,
+                      ),
                     ],
                   ),
-                ),
+                ],
               ),
-            ),
-
-            Text(
-              product.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              unitText,
-              style: GoogleFonts.inter(
-                fontSize: 11,
-                color: AppColors.textHint,
-              ),
-            ),
-            const SizedBox(height: 8),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: Text(
-                    CurrencyFormat.convertToIdr(product.price),
-                    style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
-                      color: AppColors.primary,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                _AddToCartButton(
-                  product: product,
-                  isAvailable: isAvailable,
-                  ref: ref,
-                  context: context,
-                ),
-              ],
             ),
           ],
         ),
@@ -248,28 +207,31 @@ class _AddToCartButtonState extends State<_AddToCartButton>
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.check_circle_rounded, color: Colors.white, size: 16),
-                const SizedBox(width: 8),
+                const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    '${widget.product.name} (x1) masuk keranjang',
-                    style: GoogleFonts.inter(color: Colors.white, fontSize: 13),
+                    '${widget.product.name} masuk keranjang',
+                    style: GoogleFonts.inter(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
             action: SnackBarAction(
-              label: 'CHECKOUT',
-              textColor: AppColors.primary,
+              label: 'LIHAT',
+              textColor: AppColors.primaryLight,
               onPressed: () {
                 widget.context.push('/checkout');
               },
             ),
-            duration: const Duration(seconds: 3),
-            backgroundColor: AppColors.success,
+            duration: const Duration(seconds: 2),
+            backgroundColor: AppColors.textPrimary,
             behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           ),
         );
     }
