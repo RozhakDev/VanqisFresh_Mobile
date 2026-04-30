@@ -72,8 +72,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-      context.pop();
     }
+  }
+
+  void _onLogout() {
+    ref.read(authProvider.notifier).logout();
+    context.go('/login');
   }
 
   @override
@@ -91,98 +95,164 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         );
         ref.read(authProvider.notifier).clearError();
       }
+
+      if (previous?.user == null && next.user != null) {
+        _firstNameCtrl.text = next.user!.firstName;
+        _lastNameCtrl.text = next.user!.lastName;
+        _phoneCtrl.text = next.user!.phoneNumber ?? '';
+        _emailCtrl.text = next.user!.email;
+        _addressCtrl.text = next.user!.address ?? '';
+      }
     });
 
     final authState = ref.watch(authProvider);
     final user = authState.user;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Data pengguna tidak ditemukan')),
+      if (authState.isLoading) {
+        return const Scaffold(
+          backgroundColor: AppColors.background,
+          body: Center(
+            child: CircularProgressIndicator(color: AppColors.primary),
+          ),
+        );
+      }
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(backgroundColor: Colors.white, elevation: 0),
+        body: Center(
+          child: Text(
+            'Data pengguna tidak ditemukan',
+            style: GoogleFonts.inter(color: AppColors.textSecondary),
+          ),
+        ),
       );
     }
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
+        backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textOnPrimary),
-          onPressed: () => context.pop(),
-        ),
+        scrolledUnderElevation: 0,
         title: Text(
-          'Profil & Akun',
+          'Profil Saya',
           style: GoogleFonts.inter(
-            color: AppColors.textOnPrimary,
-            fontWeight: FontWeight.w700,
-            fontSize: 18,
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w800,
+            fontSize: 22,
+            letterSpacing: -0.5,
           ),
         ),
-        centerTitle: true,
+        centerTitle: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout_rounded, color: AppColors.error),
+            onPressed: _onLogout,
+            tooltip: 'Keluar',
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 3,
+        onTap: (index) {
+          if (index == 0) context.go('/');
+          if (index == 1) context.go('/orders');
+          if (index == 2) context.go('/checkout');
+        },
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.textHint,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        selectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700),
+        unselectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w500),
+        elevation: 20,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Beranda'),
+          BottomNavigationBarItem(icon: Icon(Icons.receipt_long_rounded), label: 'Pesanan'),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart_outlined), label: 'Keranjang'),
+          BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: 'Profil'),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryMuted,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
+                Center(
+                  child: Column(
                     children: [
                       Container(
-                        width: 52,
-                        height: 52,
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
+                        width: 90,
+                        height: 90,
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryMuted,
                           shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 4),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.15),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
                         ),
                         child: Center(
                           child: Text(
                             user.firstName.isNotEmpty ? user.firstName[0].toUpperCase() : 'U',
                             style: GoogleFonts.inter(
-                              fontSize: 22,
+                              fontSize: 36,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.textOnPrimary,
+                              color: AppColors.primaryDark,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '@${user.username}',
-                              style: GoogleFonts.inter(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Bergabung bersama VanqisFresh',
-                              style: GoogleFonts.inter(
-                                fontSize: 12,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ],
+                      const SizedBox(height: 16),
+                      Text(
+                        '${user.firstName} ${user.lastName}'.trim(),
+                        style: GoogleFonts.inter(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.section,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          '@${user.username}',
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 36),
+
+                Text(
+                  'Data Pribadi',
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 16),
 
                 Row(
                   children: [
@@ -193,7 +263,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           _buildLabel('Nama Depan'),
                           TextFormField(
                             controller: _firstNameCtrl,
-                            decoration: const InputDecoration(hintText: 'Rozhak'),
+                            decoration: _buildInputDecoration('Vanqis', Icons.person_outline_rounded),
                             validator: (value) => value == null || value.trim().isEmpty 
                                 ? 'Wajib diisi' : null,
                           ),
@@ -208,7 +278,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           _buildLabel('Nama Belakang'),
                           TextFormField(
                             controller: _lastNameCtrl,
-                            decoration: const InputDecoration(hintText: 'Dev'),
+                            decoration: _buildInputDecoration('Fresh', Icons.person_outline_rounded),
                             validator: (value) => value == null || value.trim().isEmpty 
                                 ? 'Wajib diisi' : null,
                           ),
@@ -223,10 +293,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 TextFormField(
                   controller: _phoneCtrl,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    hintText: '083847921480',
-                    prefixIcon: Icon(Icons.phone_android_rounded, color: AppColors.textHint, size: 20),
-                  ),
+                  decoration: _buildInputDecoration('08xxxxxxxx', Icons.phone_android_rounded),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) return 'Nomor HP wajib diisi';
                     final phone = value.trim();
@@ -237,14 +304,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                _buildLabel('Email (Opsional)'),
+                _buildLabel('Email'),
                 TextFormField(
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    hintText: 'rozhak@rozhak.xyz',
-                    prefixIcon: Icon(Icons.email_outlined, color: AppColors.textHint, size: 20),
-                  ),
+                  decoration: _buildInputDecoration('user@vanqisfresh.com', Icons.email_outlined),
                   validator: (value) {
                     if (value != null && value.trim().isNotEmpty) {
                       if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) return 'Format email tidak valid';
@@ -258,8 +322,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 TextFormField(
                   controller: _addressCtrl,
                   maxLines: 3,
-                  decoration: const InputDecoration(
-                    hintText: 'Detail jalan, RT/RW, Kecamatan, dsb.',
+                  decoration: InputDecoration(
+                    hintText: 'Contoh: Jl. Dipayuda No. 1, RT 01/RW 02, Banjarnegara',
+                    hintStyle: GoogleFonts.inter(color: AppColors.textHint, fontSize: 14),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: AppColors.error),
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) return 'Alamat wajib diisi';
@@ -267,23 +351,35 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 40),
 
                 ElevatedButton(
                   onPressed: authState.isLoading ? null : _onUpdateProfile,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 0,
                   ),
                   child: authState.isLoading
                       ? const SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
-                            color: AppColors.textPrimary,
+                            color: Colors.white,
                             strokeWidth: 2,
                           ),
                         )
-                      : const Text('Simpan Pembaruan'),
+                      : Text(
+                          'Simpan Pembaruan',
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
                 const SizedBox(height: 32),
               ],
@@ -296,14 +392,41 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Widget _buildLabel(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6, left: 4),
+      padding: const EdgeInsets.only(bottom: 8, left: 4),
       child: Text(
         text,
         style: GoogleFonts.inter(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
+          color: AppColors.textSecondary,
         ),
+      ),
+    );
+  }
+
+  InputDecoration _buildInputDecoration(String hint, IconData icon) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: GoogleFonts.inter(color: AppColors.textHint, fontSize: 14),
+      prefixIcon: Icon(icon, color: AppColors.textHint, size: 20),
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: AppColors.border),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: AppColors.border),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: AppColors.primary, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: AppColors.error),
       ),
     );
   }

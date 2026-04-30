@@ -72,9 +72,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: 0,
           onTap: (index) {
-            if (index == 1) context.push('/orders');
-            if (index == 2) context.push('/checkout');
-            if (index == 3) context.push('/profile');
+            if (index == 1) context.go('/orders');
+            if (index == 2) context.go('/checkout');
+            if (index == 3) context.go('/profile');
           },
           type: BottomNavigationBarType.fixed,
           backgroundColor: Colors.white,
