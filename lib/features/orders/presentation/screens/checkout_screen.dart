@@ -117,109 +117,30 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final totalPrice = ref.read(cartProvider.notifier).totalPrice;
     final user = ref.watch(authProvider).user;
 
+    Widget bodyContent;
     if (cartItems.isEmpty) {
-      return Scaffold(
-        backgroundColor: AppColors.background,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go('/');
-              }
-            },
-          ),
-          title: Text(
-            'Checkout',
-            style: GoogleFonts.inter(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w800,
-              fontSize: 20,
-              letterSpacing: -0.5,
+      bodyContent = Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.shopping_cart_outlined, size: 80, color: AppColors.textHint),
+            const SizedBox(height: 24),
+            Text('Masih Kosong', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+            const SizedBox(height: 8),
+            Text('Yuk, mulai belanja sayur dan buah segar!', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: () => context.go('/'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+              ),
+              child: const Text('Mulai Belanja'),
             ),
-          ),
-          centerTitle: false,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.manage_accounts_outlined, color: AppColors.textPrimary),
-              tooltip: 'Ubah Profil',
-              onPressed: () => context.push('/profile'),
-            ),
-            const SizedBox(width: 4),
           ],
-          ),
-          body: Center(
-          child: Column(            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryMuted.withValues(alpha: 0.5),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.shopping_cart_outlined, size: 64, color: AppColors.primary),
-              ),
-              const SizedBox(height: 24),
-              Text('Keranjang masih kosong', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-              const SizedBox(height: 8),
-              Text('Yuk, mulai belanja sayur dan buah segar!', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: () => context.go('/'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  backgroundColor: AppColors.primary,
-                ),
-                child: Text('Mulai Belanja', style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 15, color: Colors.white)),
-              ),
-            ],
-          ),
         ),
       );
-    }
-
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/');
-            }
-          },
-        ),
-        title: Text(
-          'Checkout',
-          style: GoogleFonts.inter(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.w800,
-            fontSize: 20,
-            letterSpacing: -0.5,
-          ),
-        ),
-        centerTitle: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.manage_accounts_outlined, color: AppColors.textPrimary),
-            tooltip: 'Ubah Profil',
-            onPressed: () => context.push('/profile'),
-          ),
-          const SizedBox(width: 4),
-        ],
-      ),
-      body: _isLoading 
+    } else {
+      bodyContent = _isLoading 
         ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
         : SafeArea(
         child: Column(
@@ -316,13 +237,75 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(item.product.name, style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.textPrimary)),
-                                    const SizedBox(height: 2),
-                                    Text('${item.quantity} x ${CurrencyFormat.convertToIdr(item.product.price)}', style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary)),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          child: Text(item.product.name, style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.textPrimary), maxLines: 2, overflow: TextOverflow.ellipsis),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(CurrencyFormat.convertToIdr(item.product.price * item.quantity), style: GoogleFonts.inter(fontWeight: FontWeight.w800, color: AppColors.primaryDark, fontSize: 14)),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text('${CurrencyFormat.convertToIdr(item.product.price)} / ${item.product.unit}', style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary)),
+                                        Row(
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                if (item.quantity == 1) {
+                                                  ref.read(cartProvider.notifier).removeItem(item.product.id);
+                                                } else {
+                                                  ref.read(cartProvider.notifier).updateQuantity(item.product.id, item.quantity - 1);
+                                                }
+                                              },
+                                              child: Container(
+                                                padding: const EdgeInsets.all(4),
+                                                decoration: BoxDecoration(
+                                                  color: item.quantity == 1 ? AppColors.error.withValues(alpha: 0.1) : Colors.transparent,
+                                                  border: Border.all(color: item.quantity == 1 ? Colors.transparent : AppColors.border),
+                                                  borderRadius: BorderRadius.circular(6)
+                                                ),
+                                                child: Icon(item.quantity == 1 ? Icons.delete_outline_rounded : Icons.remove_rounded, size: 16, color: item.quantity == 1 ? AppColors.error : AppColors.textPrimary),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 32,
+                                              child: Text(
+                                                item.quantity.toString(),
+                                                textAlign: TextAlign.center,
+                                                style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textPrimary),
+                                              ),
+                                            ),
+                                            GestureDetector(
+                                              onTap: () {
+                                                if (item.quantity < item.product.stock) {
+                                                  ref.read(cartProvider.notifier).updateQuantity(item.product.id, item.quantity + 1);
+                                                } else {
+                                                  SnackbarUtils.show(context, 'Maksimal stok tercapai', type: SnackbarType.warning);
+                                                }
+                                              },
+                                              child: Container(
+                                                padding: const EdgeInsets.all(4),
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(color: AppColors.border),
+                                                  borderRadius: BorderRadius.circular(6),
+                                                  color: item.quantity >= item.product.stock ? AppColors.background : Colors.transparent,
+                                                ),
+                                                child: Icon(Icons.add_rounded, size: 16, color: item.quantity >= item.product.stock ? AppColors.textHint : AppColors.textPrimary),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ],
                                 ),
                               ),
-                              Text(CurrencyFormat.convertToIdr(item.product.price * item.quantity), style: GoogleFonts.inter(fontWeight: FontWeight.w800, color: AppColors.primaryDark, fontSize: 14)),
                             ],
                           ),
                         );
@@ -402,7 +385,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           ),
-                          child: Text('Buat Pesanan', style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14, color: Colors.white)),
+                          child: Text('Buat Pesanan', style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.textOnPrimary)),
                         ),
                       ),
                     ],
@@ -412,7 +395,45 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             ),
           ],
         ),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/');
+            }
+          },
+        ),
+        title: Text(
+          'Keranjang Belanja',
+          style: GoogleFonts.inter(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w800,
+            fontSize: 22,
+            letterSpacing: -0.5,
+          ),
+        ),
+        centerTitle: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.manage_accounts_outlined, color: AppColors.textPrimary),
+            tooltip: 'Ubah Profil',
+            onPressed: () => context.push('/profile'),
+          ),
+          const SizedBox(width: 4),
+        ],
       ),
+      body: bodyContent,
     );
   }
 }

@@ -76,7 +76,7 @@ class OrderDetailScreen extends ConsumerWidget {
           style: GoogleFonts.inter(
             color: AppColors.textPrimary,
             fontWeight: FontWeight.w800,
-            fontSize: 20,
+            fontSize: 22,
             letterSpacing: -0.5,
           ),
         ),

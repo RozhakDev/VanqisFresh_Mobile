@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -13,13 +14,26 @@ import '../../features/orders/presentation/screens/order_list_screen.dart';
 import '../../features/orders/presentation/screens/order_detail_screen.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 
+class RouterNotifier extends ChangeNotifier {
+  final Ref _ref;
+
+  RouterNotifier(this._ref) {
+    _ref.listen(authProvider, (_, __) {
+      notifyListeners();
+    });
+  }
+}
+
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authProvider);
+  final notifier = RouterNotifier(ref);
 
   return GoRouter(
     initialLocation: '/',
+    refreshListenable: notifier,
     debugLogDiagnostics: true,
     redirect: (context, state) {
+      final authState = ref.read(authProvider);
+      
       final isLoggedIn = authState.user != null;
       final isAuthRoute = state.matchedLocation == '/login' ||
           state.matchedLocation == '/register' ||

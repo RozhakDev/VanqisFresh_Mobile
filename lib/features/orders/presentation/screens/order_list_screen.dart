@@ -130,8 +130,18 @@ class OrderListScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Icon(Icons.receipt_long_rounded, size: 80, color: AppColors.textHint),
-                  const SizedBox(height: 16),
-                  Text('Belum ada pesanan', style: GoogleFonts.inter(fontSize: 18, color: AppColors.textSecondary)),
+                  const SizedBox(height: 24),
+                  Text('Belum Ada Pesanan', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                  const SizedBox(height: 8),
+                  Text('Ayo mulai belanja dan penuhi kulkasmu!', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
+                  const SizedBox(height: 32),
+                  ElevatedButton(
+                    onPressed: () => context.go('/'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                    ),
+                    child: const Text('Mulai Belanja'),
+                  ),
                 ],
               ),
             );
