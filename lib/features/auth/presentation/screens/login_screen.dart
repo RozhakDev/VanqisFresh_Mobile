@@ -19,6 +19,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _passwordCtrl = TextEditingController();
 
   bool _obscurePassword = true;
+  bool _messageShown = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkMessage();
+    });
+  }
+
+  void _checkMessage() {
+    if (!mounted || _messageShown) return;
+    
+    final message = GoRouterState.of(context).uri.queryParameters['message'];
+    if (message != null && message.isNotEmpty) {
+      _messageShown = true;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            message,
+            style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600),
+          ),
+          backgroundColor: AppColors.info,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
 
   @override
   void dispose() {

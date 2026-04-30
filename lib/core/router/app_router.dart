@@ -11,11 +11,40 @@ import '../../features/orders/presentation/screens/checkout_screen.dart';
 import '../../features/orders/presentation/screens/payment_screen.dart';
 import '../../features/orders/presentation/screens/order_list_screen.dart';
 import '../../features/orders/presentation/screens/order_detail_screen.dart';
+import '../../features/auth/presentation/providers/auth_provider.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
+  final authState = ref.watch(authProvider);
+
   return GoRouter(
     initialLocation: '/',
     debugLogDiagnostics: true,
+    redirect: (context, state) {
+      final isLoggedIn = authState.user != null;
+      final isAuthRoute = state.matchedLocation == '/login' ||
+          state.matchedLocation == '/register' ||
+          state.matchedLocation == '/verify-email';
+
+      final protectedRoutes = [
+        '/profile',
+        '/checkout',
+        '/orders',
+        '/payment',
+      ];
+
+      final isProtectedRoute =
+          protectedRoutes.any((route) => state.matchedLocation.startsWith(route));
+
+      if (!isLoggedIn && isProtectedRoute) {
+        return '/login?message=Silakan login terlebih dahulu untuk mengakses fitur ini';
+      }
+
+      if (isLoggedIn && isAuthRoute) {
+        return '/';
+      }
+
+      return null;
+    },
     routes: [
       GoRoute(
         path: '/',
