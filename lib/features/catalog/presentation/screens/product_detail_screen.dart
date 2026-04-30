@@ -131,8 +131,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                 pinned: true,
                 backgroundColor: AppColors.surface,
                 surfaceTintColor: Colors.transparent,
+                leadingWidth: 64,
                 leading: Padding(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.only(left: 20, top: 8, bottom: 8),
                   child: GestureDetector(
                     onTap: () => context.pop(),
                     child: Container(

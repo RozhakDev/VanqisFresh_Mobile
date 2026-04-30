@@ -66,6 +66,54 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     }
   }
 
+  void _showZoomableImage(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(16),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            InteractiveViewer(
+              panEnabled: true,
+              boundaryMargin: const EdgeInsets.all(20),
+              minScale: 0.5,
+              maxScale: 4,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  fit: BoxFit.contain,
+                  placeholder: (context, url) => Container(
+                    color: Colors.white,
+                    width: 300,
+                    height: 300,
+                    child: const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.white,
+                    width: 300,
+                    height: 300,
+                    child: const Center(child: Icon(Icons.broken_image_rounded, size: 50, color: AppColors.textHint)),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: IconButton(
+                icon: const Icon(Icons.close_rounded, color: Colors.white, size: 30, shadows: [Shadow(color: Colors.black54, blurRadius: 4)]),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final paymentsAsync = ref.watch(paymentMethodsProvider);
@@ -73,38 +121,79 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
+        backgroundColor: Colors.white,
         elevation: 0,
-        title: Text('Pembayaran', style: GoogleFonts.inter(color: AppColors.textOnPrimary, fontWeight: FontWeight.w700, fontSize: 18)),
-        centerTitle: true,
+        scrolledUnderElevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
+          onPressed: () => context.pop(),
+        ),
+        title: Text(
+          'Pembayaran',
+          style: GoogleFonts.inter(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w800,
+            fontSize: 20,
+            letterSpacing: -0.5,
+          ),
+        ),
+        centerTitle: false,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.border),
+              ),
+              child: const Icon(
+                Icons.support_agent_rounded,
+                color: AppColors.textPrimary,
+                size: 22,
+              ),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Pesanan Berhasil Dibuat!', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w800, color: AppColors.primaryDark), textAlign: TextAlign.center),
               const SizedBox(height: 8),
-              Text('ID: ${widget.publicId}', style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary), textAlign: TextAlign.center),
+              Text('Pesanan Berhasil Dibuat!', style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.primaryDark), textAlign: TextAlign.center),
+              const SizedBox(height: 8),
+              Text('ID: ${widget.publicId}', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary), textAlign: TextAlign.center),
               const SizedBox(height: 32),
 
               Text('Pilih Metode Pembayaran', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               
               paymentsAsync.when(
                 data: (methods) => methods.isEmpty 
-                  ? const Text('Belum ada metode pembayaran yang dikonfigurasi admin.')
+                  ? Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: const Center(child: Text('Belum ada metode pembayaran yang dikonfigurasi admin.', textAlign: TextAlign.center)),
+                    )
                   : Column(
                       children: methods.map((m) {
                         final hasQr = m['qr_code'] != null && m['qr_code'].toString().isNotEmpty;
                         
                         return Container(
-                          margin: const EdgeInsets.only(bottom: 12),
+                          margin: const EdgeInsets.only(bottom: 16),
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: AppColors.border),
                           ),
                           child: Column(
@@ -113,9 +202,12 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                               Row(
                                 children: [
                                   Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: const BoxDecoration(color: AppColors.primaryMuted, shape: BoxShape.circle),
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primaryMuted.withOpacity(0.4), 
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
                                     child: const Icon(Icons.account_balance_wallet_rounded, color: AppColors.primary),
                                   ),
                                   const SizedBox(width: 16),
@@ -123,7 +215,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(m['name'] ?? 'Bank', style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 15)),
+                                        Text(m['name'] ?? 'Bank', style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.textPrimary)),
                                         const SizedBox(height: 4),
                                         Text('${m['account_number'] ?? ''} a.n ${m['account_name'] ?? ''}', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
                                       ],
@@ -134,27 +226,50 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                               if (hasQr) ...[
                                 const SizedBox(height: 16),
                                 const Divider(color: AppColors.border),
-                                const SizedBox(height: 12),
+                                const SizedBox(height: 16),
                                 Center(
                                   child: Column(
                                     children: [
-                                      Text('Scan QRIS di bawah ini:', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+                                      Text('Scan QRIS di bawah ini:', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
                                       const SizedBox(height: 12),
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: CachedNetworkImage(
-                                          imageUrl: m['qr_code'],
-                                          width: 200,
-                                          height: 200,
-                                          fit: BoxFit.cover,
-                                          placeholder: (context, url) => const SizedBox(
-                                            width: 200, height: 200,
-                                            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                                          ),
-                                          errorWidget: (context, url, error) => const SizedBox(
-                                            width: 200, height: 200,
-                                            child: Center(child: Icon(Icons.broken_image_rounded, size: 50, color: AppColors.textHint)),
-                                          ),
+                                      GestureDetector(
+                                        onTap: () => _showZoomableImage(context, m['qr_code']),
+                                        child: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(16),
+                                                border: Border.all(color: AppColors.border),
+                                                color: Colors.white,
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(16),
+                                                child: CachedNetworkImage(
+                                                  imageUrl: m['qr_code'],
+                                                  width: 220,
+                                                  height: 220,
+                                                  fit: BoxFit.cover,
+                                                  placeholder: (context, url) => const SizedBox(
+                                                    width: 220, height: 220,
+                                                    child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary)),
+                                                  ),
+                                                  errorWidget: (context, url, error) => const SizedBox(
+                                                    width: 220, height: 220,
+                                                    child: Center(child: Icon(Icons.broken_image_rounded, size: 50, color: AppColors.textHint)),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding: const EdgeInsets.all(8),
+                                              decoration: BoxDecoration(
+                                                color: Colors.black.withOpacity(0.5),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(Icons.zoom_in_rounded, color: Colors.white, size: 24),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
@@ -166,10 +281,18 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                         );
                       }).toList(),
                   ),
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Text('Gagal memuat metode pembayaran: $e'),
+                loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                error: (e, _) => Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.error),
+                  ),
+                  child: Text('Gagal memuat metode pembayaran: $e', style: GoogleFonts.inter(color: AppColors.error)),
+                ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 32),
 
               Text('Upload Bukti Transfer', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
               const SizedBox(height: 12),
@@ -177,44 +300,81 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
               GestureDetector(
                 onTap: _isUploading ? null : _pickImage,
                 child: Container(
-                  height: 150,
+                  height: 160,
                   decoration: BoxDecoration(
                     color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.primary, width: 1.5, style: BorderStyle.solid),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.primary.withOpacity(0.5), width: 1.5, style: BorderStyle.solid),
                   ),
                   child: _selectedImage != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.file(_selectedImage!, fit: BoxFit.cover, width: double.infinity),
+                    ? Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: Image.file(_selectedImage!, fit: BoxFit.cover),
+                          ),
+                          Positioned(
+                            right: 8,
+                            top: 8,
+                            child: GestureDetector(
+                              onTap: () => setState(() => _selectedImage = null),
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: const BoxDecoration(
+                                  color: Colors.black54,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.close_rounded, color: Colors.white, size: 18),
+                              ),
+                            ),
+                          )
+                        ],
                       )
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.cloud_upload_rounded, size: 40, color: AppColors.primary),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryMuted.withOpacity(0.3),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.cloud_upload_rounded, size: 32, color: AppColors.primary),
+                          ),
                           const SizedBox(height: 12),
-                          Text('Ketuk untuk memilih foto (JPG/PNG)', style: GoogleFonts.inter(color: AppColors.textSecondary, fontSize: 14)),
+                          Text('Ketuk untuk memilih foto', style: GoogleFonts.inter(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 4),
+                          Text('Format yang didukung: JPG/PNG', style: GoogleFonts.inter(color: AppColors.textSecondary, fontSize: 12)),
                         ],
                       ),
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 40),
 
               ElevatedButton(
                 onPressed: _selectedImage == null || _isUploading ? null : _uploadProof,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  backgroundColor: AppColors.primary,
+                  disabledBackgroundColor: AppColors.border,
                 ),
                 child: _isUploading
                     ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : const Text('Konfirmasi Pembayaran'),
+                    : Text('Konfirmasi Pembayaran', style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 15, color: Colors.white)),
               ),
               
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () => context.go('/'),
-                child: Text('Bayar Nanti (Lewati)', style: GoogleFonts.inter(color: AppColors.textHint)),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+                child: Text('Bayar Nanti (Lewati)', style: GoogleFonts.inter(color: AppColors.textSecondary, fontWeight: FontWeight.w600, fontSize: 15)),
               ),
+              const SizedBox(height: 24),
             ],
           ),
         ),

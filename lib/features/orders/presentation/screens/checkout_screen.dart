@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -99,7 +100,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       text.writeln('Catatan: ${_noteController.text.trim().isEmpty ? "-" : _noteController.text.trim()}');
       text.writeln('Total: ${CurrencyFormat.convertToIdr(ref.read(cartProvider.notifier).totalPrice)}');
       text.writeln();
-      text.writeln('Info Pengiriman:');
+      text.writeln('Identitas Pengiriman:');
       text.writeln('Nama: ${user.firstName} ${user.lastName}');
       text.writeln('Alamat: ${user.address}');
       text.writeln('No HP: ${user.phoneNumber}');
@@ -134,23 +135,65 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
     if (cartItems.isEmpty) {
       return Scaffold(
-        backgroundColor: AppColors.surface,
+        backgroundColor: AppColors.background,
         appBar: AppBar(
-          backgroundColor: AppColors.surface,
-          title: Text('Checkout', style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 18)),
-          centerTitle: true,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          scrolledUnderElevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded),
-            onPressed: () => context.pop(),
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/');
+              }
+            },
           ),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          title: Text(
+            'Checkout',
+            style: GoogleFonts.inter(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w800,
+              fontSize: 20,
+              letterSpacing: -0.5,
+            ),
+          ),
+          centerTitle: false,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.manage_accounts_outlined, color: AppColors.textPrimary),
+              tooltip: 'Ubah Profil',
+              onPressed: () => context.push('/profile'),
+            ),
+            const SizedBox(width: 4),
+          ],
+          ),
+          body: Center(
+          child: Column(            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.shopping_cart_outlined, size: 80, color: AppColors.textHint),
-              const SizedBox(height: 16),
-              Text('Keranjang kosong', style: GoogleFonts.inter(fontSize: 18, color: AppColors.textSecondary)),
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryMuted.withOpacity(0.5),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.shopping_cart_outlined, size: 64, color: AppColors.primary),
+              ),
+              const SizedBox(height: 24),
+              Text('Keranjang masih kosong', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+              const SizedBox(height: 8),
+              Text('Yuk, mulai belanja sayur dan buah segar!', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
+              const SizedBox(height: 32),
+              ElevatedButton(
+                onPressed: () => context.go('/'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  backgroundColor: AppColors.primary,
+                ),
+                child: Text('Mulai Belanja', style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 15, color: Colors.white)),
+              ),
             ],
           ),
         ),
@@ -160,21 +203,37 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
+        backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textOnPrimary),
-          onPressed: () => context.pop(),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/');
+            }
+          },
         ),
         title: Text(
-          'Detail Pemesanan',
+          'Checkout',
           style: GoogleFonts.inter(
-            color: AppColors.textOnPrimary,
-            fontWeight: FontWeight.w700,
-            fontSize: 18,
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w800,
+            fontSize: 20,
+            letterSpacing: -0.5,
           ),
         ),
-        centerTitle: true,
+        centerTitle: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.manage_accounts_outlined, color: AppColors.textPrimary),
+            tooltip: 'Ubah Profil',
+            onPressed: () => context.push('/profile'),
+          ),
+          const SizedBox(width: 4),
+        ],
       ),
       body: _isLoading 
         ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
@@ -185,80 +244,101 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               child: ListView(
                 padding: const EdgeInsets.all(20),
                 children: [
-                  Text('Alamat Pengiriman', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                  Text('Identitas Pengiriman', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
                   const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))
-                      ],
+                      border: Border.all(color: AppColors.border),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.location_on_rounded, color: AppColors.primaryDark, size: 20),
+                            const Icon(Icons.person_rounded, color: AppColors.primary, size: 16),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 user?.firstName != null ? '${user?.firstName} ${user?.lastName}' : 'User',
-                                style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14),
+                                style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.textPrimary),
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 8),
-                        Text(user?.phoneNumber ?? '-', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
-                        const SizedBox(height: 4),
-                        Text(user?.address ?? 'Alamat belum diatur', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
+                        Row(
+                          children: [
+                            const Icon(Icons.phone_rounded, color: AppColors.textHint, size: 16),
+                            const SizedBox(width: 8),
+                            Text(user?.phoneNumber ?? '-', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.location_on_rounded, color: AppColors.textHint, size: 16),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(user?.address ?? 'Alamat belum diatur', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
 
-                  Text('Ringkasan Pesanan', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                  Text('Rincian Pesanan', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
                   const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))
-                      ],
+                      border: Border.all(color: AppColors.border),
                     ),
                     child: Column(
                       children: cartItems.map((item) {
+                        final String imageUrl = item.product.image;
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.only(bottom: 16),
                           child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Container(
-                                width: 50,
-                                height: 50,
+                                width: 52, 
+                                height: 52,
                                 decoration: BoxDecoration(
-                                  color: AppColors.background,
-                                  borderRadius: BorderRadius.circular(8),
+                                  color: AppColors.background, 
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: AppColors.border)
                                 ),
-                                child: const Icon(Icons.eco_rounded, color: AppColors.primaryMuted),
+                                clipBehavior: Clip.hardEdge,
+                                child: imageUrl.isNotEmpty
+                                    ? CachedNetworkImage(
+                                        imageUrl: imageUrl,
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) => const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary))),
+                                        errorWidget: (context, url, error) => const Icon(Icons.shopping_cart_outlined, color: AppColors.textHint, size: 24),
+                                      )
+                                    : const Icon(Icons.shopping_cart_outlined, color: AppColors.primary, size: 24),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(item.product.name, style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14)),
-                                    const SizedBox(height: 4),
+                                    Text(item.product.name, style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.textPrimary)),
+                                    const SizedBox(height: 2),
                                     Text('${item.quantity} x ${CurrencyFormat.convertToIdr(item.product.price)}', style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary)),
                                   ],
                                 ),
                               ),
-                              Text(CurrencyFormat.convertToIdr(item.product.price * item.quantity), style: GoogleFonts.inter(fontWeight: FontWeight.w700, color: AppColors.primaryDark)),
+                              Text(CurrencyFormat.convertToIdr(item.product.price * item.quantity), style: GoogleFonts.inter(fontWeight: FontWeight.w800, color: AppColors.primaryDark, fontSize: 14)),
                             ],
                           ),
                         );
@@ -272,8 +352,23 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   TextField(
                     controller: _noteController,
                     maxLines: 2,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Cth: Tolong pilihkan buah yang masih mengkal.',
+                      hintStyle: GoogleFonts.inter(color: AppColors.textHint, fontSize: 13),
+                      filled: true,
+                      fillColor: AppColors.surface,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: AppColors.border),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: AppColors.border),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 40),
@@ -286,7 +381,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 boxShadow: AppColors.bottomBarShadow,
-                border: const Border(top: BorderSide(color: AppColors.border, width: 0.5)),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -294,8 +388,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Total Pembayaran', style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary)),
-                      Text(CurrencyFormat.convertToIdr(totalPrice), style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                      Text('Total Pembayaran', style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
+                      Text(CurrencyFormat.convertToIdr(totalPrice), style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.primaryDark)),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -308,20 +402,23 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                           label: const Text('WhatsApp'),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: const Color(0xFF25D366),
-                            side: const BorderSide(color: Color(0xFF25D366)),
+                            side: const BorderSide(color: Color(0xFF25D366), width: 1.5),
                             padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           ),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        flex: 2,
+                        flex: 1,
                         child: ElevatedButton(
                           onPressed: _processApiCheckout,
                           style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
                             padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           ),
-                          child: const Text('Checkout Via Aplikasi'),
+                          child: Text('Buat Pesanan', style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14, color: Colors.white)),
                         ),
                       ),
                     ],
