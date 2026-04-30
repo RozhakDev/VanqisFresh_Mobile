@@ -52,9 +52,9 @@ class _PromoCarouselWidgetState extends State<_PromoCarouselWidget> {
   Timer? _autoScrollTimer;
 
   static const List<List<Color>> _gradients = [
-    [Color(0xFF16A34A), Color(0xFF22C55E)],
-    [Color(0xFF047857), Color(0xFF10B981)],
-    [Color(0xFF0284C7), Color(0xFF0EA5E9)],
+    [Color(0xFFEAB308), Color(0xFFFDE047)], // Warm Yellow
+    [Color(0xFF134E4A), Color(0xFF065F46)], // Dark Green
+    [Color(0xFFF97316), Color(0xFFFB923C)], // Orange
   ];
 
   @override

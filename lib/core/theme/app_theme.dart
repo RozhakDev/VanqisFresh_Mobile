@@ -3,16 +3,16 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  static const Color primary = Color(0xFF16A34A); 
-  static const Color primaryDark = Color(0xFF15803D);
-  static const Color primaryLight = Color(0xFF4ADE80);
+  static const Color primary = Color(0xFFEAB308);
+  static const Color primaryDark = Color(0xFF134E4A);
+  static const Color primaryLight = Color(0xFFFDE047);
   
   static const Color brandYellow = Color(0xFFEAB308);
   static const Color brandOrange = Color(0xFFF97316);
   static const Color brandRed    = Color(0xFFEF4444);
 
-  static const Color primaryMuted = Color(0xFFDCFCE7);
-  static const Color primarySurface = Color(0xFFF0FDF4);
+  static const Color primaryMuted = Color(0xFFFEF9C3);
+  static const Color primarySurface = Color(0xFFFEFCE8);
   static const Color accentGreen  = Color(0xFF16A34A);
   static const Color accentRed    = Color(0xFFFF4038);
   static const Color accentOrange = Color(0xFFEA580C);
@@ -28,7 +28,7 @@ class AppColors {
   static const Color textPrimary   = Color(0xFF134E4A);
   static const Color textSecondary = Color(0xFF6B7280);
   static const Color textHint      = Color(0xFF9CA3AF);
-  static const Color textOnPrimary = Color(0xFFFFFFFF);
+  static const Color textOnPrimary = Color(0xFF134E4A);
 
   static const Color error   = Color(0xFFEF4444);
   static const Color success = Color(0xFF22C55E);
@@ -106,7 +106,7 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.textOnPrimary,
           elevation: 0,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
@@ -118,8 +118,8 @@ class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          side: const BorderSide(color: AppColors.primary, width: 1.5),
+          foregroundColor: AppColors.primaryDark,
+          side: const BorderSide(color: AppColors.primaryDark, width: 1.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
