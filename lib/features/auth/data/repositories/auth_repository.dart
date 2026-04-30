@@ -43,10 +43,41 @@ class AuthRepository {
     }
   }
 
-  Future<Map<String, String>> login(String username, String password) async {
+  Future<void> verifyEmail(String email, String otp) async {
+    try {
+      await _dio.post('/users/verify-email/', data: {
+        'email': email,
+        'otp_code': otp,
+      });
+    } on DioException catch (e) {
+      if (e.response != null && e.response!.data is Map) {
+        final err = e.response!.data as Map;
+        final errors = err.values.expand((v) => v is List ? v : [v]).join('\n');
+        throw Exception(errors.isNotEmpty ? errors : 'Verifikasi gagal. Cek kode OTP.');
+      }
+      throw Exception('Gagal memverifikasi. Periksa koneksi Anda.');
+    }
+  }
+
+  Future<void> resendOtp(String email) async {
+    try {
+      await _dio.post('/users/resend-otp/', data: {
+        'email': email,
+      });
+    } on DioException catch (e) {
+      if (e.response != null && e.response!.data is Map) {
+        final err = e.response!.data as Map;
+        final errors = err.values.expand((v) => v is List ? v : [v]).join('\n');
+        throw Exception(errors.isNotEmpty ? errors : 'Gagal mengirim ulang OTP.');
+      }
+      throw Exception('Kesalahan jaringan saat mengirim ulang OTP.');
+    }
+  }
+
+  Future<Map<String, String>> login(String email, String password) async {
     try {
       final response = await _dio.post('/users/login/', data: {
-        'username': username,
+        'username': email,
         'password': password,
       });
 
@@ -55,10 +86,21 @@ class AuthRepository {
         'refresh': response.data['refresh'],
       };
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        throw Exception('Username atau password salah.');
+      if (e.response != null && e.response!.data is Map) {
+        final data = e.response!.data as Map;
+        if (data.containsKey('errors')) {
+          final errors = data['errors'] as Map;
+          if (errors['is_verified'] != null && errors['is_verified'].toString() == '[False]') {
+             throw Exception('UNVERIFIED:$email');
+          }
+          final errorMessages = errors.values.expand((v) => v is List ? v : [v]).join('\n');
+          throw Exception(errorMessages.isNotEmpty ? errorMessages : 'Login gagal');
+        }
+        if (data.containsKey('detail')) {
+          throw Exception(data['detail']);
+        }
       }
-      throw Exception('Kesalahan jaringan saat login.');
+      throw Exception('Kesalahan jaringan atau kredensial salah.');
     }
   }
 

@@ -15,14 +15,14 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _usernameCtrl = TextEditingController();
+  final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
 
   bool _obscurePassword = true;
 
   @override
   void dispose() {
-    _usernameCtrl.dispose();
+    _emailCtrl.dispose();
     _passwordCtrl.dispose();
     super.dispose();
   }
@@ -33,7 +33,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     FocusScope.of(context).unfocus();
 
     final success = await ref.read(authProvider.notifier).login(
-          _usernameCtrl.text.trim(),
+          _emailCtrl.text.trim(),
           _passwordCtrl.text,
         );
 
@@ -48,6 +48,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     ref.listen(authProvider, (previous, next) {
       if (next.error != null) {
+        if (next.error!.startsWith('UNVERIFIED:')) {
+          final unverifiedEmail = next.error!.split(':')[1];
+          ref.read(authProvider.notifier).clearError();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Email belum diverifikasi. Mengalihkan ke halaman OTP...', 
+                style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600)
+              ),
+              backgroundColor: AppColors.accentOrange,
+            ),
+          );
+          context.go('/verify-email?email=$unverifiedEmail');
+          return;
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -114,15 +130,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 40),
 
-                  _buildLabel('Username'),
+                  _buildLabel('Email'),
                   TextFormField(
-                    controller: _usernameCtrl,
+                    controller: _emailCtrl,
+                    keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
-                      hintText: 'rozhak_official',
-                      prefixIcon: Icon(Icons.person_outline_rounded, color: AppColors.textHint, size: 20),
+                      hintText: 'rozhak@rozhak.xyz',
+                      prefixIcon: Icon(Icons.email_outlined, color: AppColors.textHint, size: 20),
                     ),
                     validator: (value) {
-                      if (value == null || value.trim().isEmpty) return 'Username wajib diisi';
+                      if (value == null || value.trim().isEmpty) return 'Email wajib diisi';
+                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) return 'Format email tidak valid';
                       return null;
                     },
                   ),

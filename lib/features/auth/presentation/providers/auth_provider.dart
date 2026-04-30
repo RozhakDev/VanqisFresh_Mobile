@@ -33,10 +33,10 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
-  Future<bool> login(String username, String password) async {
+  Future<bool> login(String email, String password) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      final tokens = await _repository.login(username, password);
+      final tokens = await _repository.login(email, password);
       await _repository.saveTokens(tokens['access']!, tokens['refresh']!);
       final user = await _repository.fetchProfile();
 

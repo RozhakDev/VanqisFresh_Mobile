@@ -58,13 +58,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Registrasi berhasil! Silakan masuk.',
+            'Registrasi berhasil! Silakan verifikasi email Anda.',
             style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600),
           ),
           backgroundColor: AppColors.success,
         ),
       );
-      context.go('/login');
+      final registeredEmail = _emailCtrl.text.trim();
+      context.go('/verify-email?email=$registeredEmail');
     }
   }
 
@@ -190,7 +191,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                _buildLabel('Email (Opsional)'),
+                _buildLabel('Email'),
                 TextFormField(
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
@@ -199,9 +200,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     prefixIcon: Icon(Icons.email_outlined, color: AppColors.textHint, size: 20),
                   ),
                   validator: (value) {
-                    if (value != null && value.trim().isNotEmpty) {
-                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) return 'Format email tidak valid';
-                    }
+                    if (value == null || value.trim().isEmpty) return 'Email wajib diisi';
+                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) return 'Format email tidak valid';
                     return null;
                   },
                 ),

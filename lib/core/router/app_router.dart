@@ -5,6 +5,7 @@ import '../../features/catalog/presentation/screens/home_screen.dart';
 import '../../features/catalog/presentation/screens/product_detail_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
+import '../../features/auth/presentation/screens/verify_email_screen.dart';
 import '../../features/auth/presentation/screens/profile_screen.dart';
 import '../../features/orders/presentation/screens/checkout_screen.dart';
 import '../../features/orders/presentation/screens/payment_screen.dart';
@@ -69,6 +70,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/register',
         name: 'register',
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/verify-email',
+        name: 'verify_email',
+        builder: (context, state) {
+          final email = state.uri.queryParameters['email'] ?? '';
+          return VerifyEmailScreen(email: email);
+        },
       ),
     ],
   );
