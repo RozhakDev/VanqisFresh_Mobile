@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../providers/catalog_provider.dart';
-import '../widgets/section_header.dart';
+import 'promo_products_sheet.dart';
 import '../../domain/models/promo.dart';
 
 class PromoBannerCarousel extends ConsumerWidget {
@@ -149,9 +149,9 @@ class _PromoBannerCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: AppColors.textPrimary.withValues(alpha: 0.08),
+              blurRadius: 16,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
@@ -251,18 +251,22 @@ class _PromoBannerCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                   ],
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
+                  Material(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    child: InkWell(
+                      onTap: () => PromoProductsSheet.show(context, promo),
                       borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      'Lihat Promo',
-                      style: GoogleFonts.inter(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        child: Text(
+                          'Lihat Promo',
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primaryDark,
+                          ),
+                        ),
                       ),
                     ),
                   ),

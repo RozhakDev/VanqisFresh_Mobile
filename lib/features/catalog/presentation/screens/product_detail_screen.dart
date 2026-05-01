@@ -10,6 +10,7 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../../domain/models/product.dart';
 import '../providers/catalog_provider.dart';
+import '../widgets/product_image_placeholder.dart';
 import '../../../orders/presentation/providers/cart_provider.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
@@ -385,9 +386,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
   Widget _buildPlaceholder() {
     return Container(
       color: AppColors.border,
-      child: const Center(
-        child: Icon(Icons.shopping_cart_rounded, size: 80, color: AppColors.textHint),
-      ),
+      child: const ProductImagePlaceholder(iconSize: 80),
     );
   }
 

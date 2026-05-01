@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../catalog/presentation/widgets/product_image_placeholder.dart';
 import '../../data/repositories/order_repository.dart';
 
 final orderDetailProvider = FutureProvider.family.autoDispose<Map<String, dynamic>, String>((ref, publicId) async {
@@ -253,9 +254,9 @@ class OrderDetailScreen extends ConsumerWidget {
                                             imageUrl: imageUrl,
                                             fit: BoxFit.cover,
                                             placeholder: (context, url) => const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary))),
-                                            errorWidget: (context, url, error) => const Icon(Icons.shopping_cart_outlined, color: AppColors.textHint, size: 24),
+                                            errorWidget: (context, url, error) => const ProductImagePlaceholder(iconSize: 24),
                                           )
-                                        : const Icon(Icons.shopping_cart_outlined, color: AppColors.primary, size: 24),
+                                        : const ProductImagePlaceholder(iconSize: 24, iconColor: AppColors.primaryDark),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(

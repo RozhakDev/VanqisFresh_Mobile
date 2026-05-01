@@ -10,6 +10,7 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../../domain/models/product.dart';
 import '../../../orders/presentation/providers/cart_provider.dart';
+import 'product_image_placeholder.dart';
 
 class ProductCard extends ConsumerWidget {
   final Product product;
@@ -50,13 +51,7 @@ class ProductCard extends ConsumerWidget {
                         ),
                         errorWidget: (context, url, error) => Container(
                           color: AppColors.border,
-                          child: const Center(
-                            child: Icon(
-                              Icons.shopping_cart_rounded,
-                              color: AppColors.textHint,
-                              size: 48,
-                            ),
-                          ),
+                          child: const ProductImagePlaceholder(iconSize: 48),
                         ),
                       ),
                     ),
