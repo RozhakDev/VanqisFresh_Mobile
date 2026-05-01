@@ -20,10 +20,9 @@ class OrderRepository {
       return response.data;
     } on DioException catch (e) {
       if (e.response != null && e.response!.data != null) {
-        final err = e.response!.data.toString();
-        throw Exception(err);
+        throw Exception('Terjadi kesalahan\nCoba lagi ya');
       }
-      throw Exception('Kesalahan jaringan saat checkout.');
+      throw Exception('Checkout belum berhasil\nCoba lagi ya');
     }
   }
 
@@ -37,7 +36,7 @@ class OrderRepository {
       }
       return [];
     } catch (e) {
-      throw Exception('Gagal mengambil daftar metode pembayaran.');
+      throw Exception('Terjadi kesalahan\nCoba lagi ya');
     }
   }
 
@@ -53,9 +52,9 @@ class OrderRepository {
       );
     } on DioException catch (e) {
       if (e.response != null && e.response!.data != null) {
-        throw Exception(e.response!.data.toString());
+        throw Exception('Terjadi kesalahan server\nCoba lagi');
       }
-      throw Exception('Gagal mengupload bukti pembayaran.');
+      throw Exception('Upload bukti belum berhasil\nCoba lagi ya');
     }
   }
 
@@ -69,7 +68,7 @@ class OrderRepository {
       } else if (response.data is Map && response.data['results'] != null) {
         dataList = response.data['results'];
       } else {
-        throw Exception('Format response kontak tidak dikenali');
+        throw Exception('Belum bisa ambil kontak WhatsApp\nCoba lagi');
       }
 
       final wa = dataList.firstWhere(
@@ -80,9 +79,9 @@ class OrderRepository {
       if (wa != null && wa['account_id'] != null) {
         return wa['account_id'].toString();
       }
-      throw Exception('Nomor WhatsApp tidak ditemukan di backend');
+      throw Exception('Nomor WhatsApp belum tersedia\nHubungi admin ya');
     } catch (e) {
-      throw Exception('Gagal mengambil kontak WhatsApp: $e');
+      throw Exception('Belum bisa ambil kontak WhatsApp\nCoba lagi');
     }
   }
 
@@ -92,9 +91,9 @@ class OrderRepository {
       return response.data;
     } on DioException catch (e) {
       if (e.response != null && e.response!.data != null) {
-        throw Exception(e.response!.data.toString());
+        throw Exception('Terjadi kesalahan\nCoba lagi ya');
       }
-      throw Exception('Kesalahan jaringan saat mengambil riwayat pesanan.');
+      throw Exception('Riwayat pesanan belum muncul\nCoba lagi ya');
     }
   }
 
@@ -104,12 +103,12 @@ class OrderRepository {
       return response.data;
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) {
-        throw Exception('Pesanan tidak ditemukan.');
+        throw Exception('Pesanan tidak ditemukan');
       }
       if (e.response != null && e.response!.data != null) {
-        throw Exception(e.response!.data.toString());
+        throw Exception('Terjadi kesalahan\nCoba lagi ya');
       }
-      throw Exception('Kesalahan jaringan saat mengambil detail pesanan.');
+      throw Exception('Detail pesanan belum bisa dimuat\nCoba lagi');
     }
   }
 }

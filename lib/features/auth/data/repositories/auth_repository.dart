@@ -37,9 +37,9 @@ class AuthRepository {
       if (e.response != null && e.response!.data is Map) {
         final data = e.response!.data as Map;
         final errors = data.values.expand((v) => v is List ? v : [v]).join('\n');
-        throw Exception(errors.isNotEmpty ? errors : 'Gagal mendaftar');
+        throw Exception(errors.isNotEmpty ? errors : 'Daftar belum berhasil\nCoba lagi ya');
       }
-      throw Exception('Kesalahan jaringan: ${e.message}');
+      throw Exception('Lagi ada gangguan koneksi\nCoba lagi ya');
     }
   }
 
@@ -53,9 +53,9 @@ class AuthRepository {
       if (e.response != null && e.response!.data is Map) {
         final err = e.response!.data as Map;
         final errors = err.values.expand((v) => v is List ? v : [v]).join('\n');
-        throw Exception(errors.isNotEmpty ? errors : 'Verifikasi gagal. Cek kode OTP.');
+        throw Exception(errors.isNotEmpty ? errors : 'Verifikasi belum berhasil\nCoba lagi ya');
       }
-      throw Exception('Gagal memverifikasi. Periksa koneksi Anda.');
+      throw Exception('Verifikasi belum berhasil\nCoba lagi ya');
     }
   }
 
@@ -68,9 +68,9 @@ class AuthRepository {
       if (e.response != null && e.response!.data is Map) {
         final err = e.response!.data as Map;
         final errors = err.values.expand((v) => v is List ? v : [v]).join('\n');
-        throw Exception(errors.isNotEmpty ? errors : 'Gagal mengirim ulang OTP.');
+        throw Exception(errors.isNotEmpty ? errors : 'Kode gagal dikirim ulang\nCoba sebentar lagi');
       }
-      throw Exception('Kesalahan jaringan saat mengirim ulang OTP.');
+      throw Exception('Kode gagal dikirim ulang\nCoba sebentar lagi');
     }
   }
 
@@ -94,13 +94,13 @@ class AuthRepository {
              throw Exception('UNVERIFIED:$email');
           }
           final errorMessages = errors.values.expand((v) => v is List ? v : [v]).join('\n');
-          throw Exception(errorMessages.isNotEmpty ? errorMessages : 'Login gagal');
+          throw Exception(errorMessages.isNotEmpty ? errorMessages : 'Login belum berhasil\nCek lagi datanya ya');
         }
         if (data.containsKey('detail')) {
-          throw Exception(data['detail']);
+          throw Exception('Login belum berhasil\nCoba lagi ya');
         }
       }
-      throw Exception('Kesalahan jaringan atau kredensial salah.');
+      throw Exception('Login belum berhasil\nCek lagi datanya ya');
     }
   }
 
@@ -109,7 +109,7 @@ class AuthRepository {
       final response = await _dio.get('/users/profile/');
       return User.fromJson(response.data);
     } on DioException catch (e) {
-      throw Exception('Gagal memuat profil: ${e.message}');
+      throw Exception('Profil belum bisa dimuat\nCoba lagi nanti');
     }
   }
 
@@ -121,9 +121,9 @@ class AuthRepository {
       if (e.response != null && e.response!.data is Map) {
         final err = e.response!.data as Map;
         final errors = err.values.expand((v) => v is List ? v : [v]).join('\n');
-        throw Exception(errors.isNotEmpty ? errors : 'Gagal memperbarui profil');
+        throw Exception(errors.isNotEmpty ? errors : 'Profil belum bisa dimuat\nCoba lagi nanti');
       }
-      throw Exception('Kesalahan jaringan: ${e.message}');
+      throw Exception('Koneksi lagi bermasalah\nCoba ulangi');
     }
   }
 

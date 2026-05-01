@@ -100,7 +100,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
       final launched = await launchUrl(finalUrl, mode: LaunchMode.externalApplication);
       if (!launched) {
-        throw Exception('Tidak dapat membuka WhatsApp. Pastikan WhatsApp terinstal di perangkat Anda.');
+        throw Exception('WhatsApp belum bisa dibuka\nPastikan sudah terpasang ya');
       }
       ref.read(cartProvider.notifier).clearCart();
       if (mounted) context.go('/');

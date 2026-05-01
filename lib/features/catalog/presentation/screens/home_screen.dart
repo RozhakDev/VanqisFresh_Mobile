@@ -271,31 +271,23 @@ class _EmptyState extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            color: AppColors.primaryMuted,
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.search_off_rounded,
-            size: 52,
-            color: AppColors.primary,
-          ),
+        const Icon(
+          Icons.search_off_rounded,
+          size: 80,
+          color: AppColors.textHint,
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 24),
         Text(
           'Produk Tidak Ditemukan',
           style: GoogleFonts.inter(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
         Text(
-          'Coba kata kunci lain atau\nlihat semua kategori produk kami.',
+          'Belum ketemu produknya\nCoba kata lain ya',
           textAlign: TextAlign.center,
           style: GoogleFonts.inter(
             fontSize: 13,
@@ -319,31 +311,23 @@ class _ErrorState extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            color: AppColors.error.withOpacity(0.08),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.wifi_off_rounded,
-            size: 48,
-            color: AppColors.error,
-          ),
+        const Icon(
+          Icons.error_outline_rounded,
+          size: 50,
+          color: AppColors.error,
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
         Text(
           'Gagal Memuat Data',
           style: GoogleFonts.inter(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(height: 8),
         Text(
-          'Periksa koneksi internet kamu\nlalu coba lagi.',
+          'Sepertinya koneksi bermasalah\nCoba lagi ya',
           textAlign: TextAlign.center,
           style: GoogleFonts.inter(
             fontSize: 13,
@@ -352,12 +336,23 @@ class _ErrorState extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        ElevatedButton.icon(
+        ElevatedButton(
           onPressed: onRetry,
-          icon: const Icon(Icons.refresh_rounded, size: 18),
-          label: const Text('Coba Lagi'),
           style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+            backgroundColor: AppColors.primary,
+            foregroundColor: AppColors.textOnPrimary,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          child: Text(
+            'Coba Lagi',
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
+            ),
           ),
         ),
       ],

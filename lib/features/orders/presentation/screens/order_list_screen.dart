@@ -158,11 +158,50 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline_rounded, size: 50, color: AppColors.error),
+            const Icon(
+              Icons.error_outline_rounded,
+              size: 50,
+              color: AppColors.error,
+            ),
             const SizedBox(height: 16),
-            Text(orderState.error!.replaceAll('Exception: ', ''), textAlign: TextAlign.center),
-            const SizedBox(height: 16),
-            ElevatedButton(onPressed: () => ref.read(ordersProvider.notifier).fetchInitial(), child: const Text('Coba Lagi')),
+            Text(
+              'Gagal Memuat Pesanan',
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              orderState.error!.replaceAll('Exception: ', ''),
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () => ref.read(ordersProvider.notifier).fetchInitial(),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.textOnPrimary,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                'Coba Lagi',
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                ),
+              ),
+            ),
           ],
         ),
       );
