@@ -86,12 +86,9 @@ class OrderRepository {
     }
   }
 
-  Future<Map<String, dynamic>> getOrders({int page = 1}) async {
+  Future<Map<String, dynamic>> getOrders({String? nextUrl}) async {
     try {
-      final response = await _dio.get(
-        '/orders/',
-        queryParameters: {'page': page},
-      );
+      final response = await _dio.get(nextUrl ?? '/orders/');
       return response.data;
     } on DioException catch (e) {
       if (e.response != null && e.response!.data != null) {

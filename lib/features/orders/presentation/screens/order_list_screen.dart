@@ -8,12 +8,109 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../data/repositories/order_repository.dart';
 
-final ordersProvider = FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
-  return ref.watch(orderRepositoryProvider).getOrders();
+class OrderPaginationState {
+  final List<dynamic> orders;
+  final bool isLoading;
+  final String? nextUrl;
+  final String? error;
+
+  OrderPaginationState({
+    this.orders = const [],
+    this.isLoading = false,
+    this.nextUrl,
+    this.error,
+  });
+
+  OrderPaginationState copyWith({
+    List<dynamic>? orders,
+    bool? isLoading,
+    String? nextUrl,
+    String? error,
+  }) {
+    return OrderPaginationState(
+      orders: orders ?? this.orders,
+      isLoading: isLoading ?? this.isLoading,
+      nextUrl: nextUrl ?? this.nextUrl,
+      error: error,
+    );
+  }
+}
+
+class OrderPaginationNotifier extends Notifier<OrderPaginationState> {
+  @override
+  OrderPaginationState build() {
+    Future.microtask(() => fetchInitial());
+    return OrderPaginationState();
+  }
+
+  Future<void> fetchInitial() async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final response = await ref.read(orderRepositoryProvider).getOrders();
+      final results = response['results'] as List? ?? [];
+      final next = response['next'] as String?;
+
+      state = OrderPaginationState(
+        orders: results,
+        isLoading: false,
+        nextUrl: next,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  Future<void> fetchNextPage() async {
+    if (state.isLoading || state.nextUrl == null) return;
+
+    state = state.copyWith(isLoading: true);
+    try {
+      final response = await ref.read(orderRepositoryProvider).getOrders(nextUrl: state.nextUrl);
+      final results = response['results'] as List? ?? [];
+      final next = response['next'] as String?;
+
+      state = OrderPaginationState(
+        orders: [...state.orders, ...results],
+        isLoading: false,
+        nextUrl: next,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+}
+
+final ordersProvider = NotifierProvider<OrderPaginationNotifier, OrderPaginationState>(() {
+  return OrderPaginationNotifier();
 });
 
-class OrderListScreen extends ConsumerWidget {
+class OrderListScreen extends ConsumerStatefulWidget {
   const OrderListScreen({super.key});
+
+  @override
+  ConsumerState<OrderListScreen> createState() => _OrderListScreenState();
+}
+
+class _OrderListScreenState extends ConsumerState<OrderListScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      ref.read(ordersProvider.notifier).fetchNextPage();
+    }
+  }
 
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
@@ -54,9 +151,171 @@ class OrderListScreen extends ConsumerWidget {
     }
   }
 
+  Widget _buildBody(OrderPaginationState orderState) {
+    if (orderState.error != null && orderState.orders.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline_rounded, size: 50, color: AppColors.error),
+            const SizedBox(height: 16),
+            Text(orderState.error!.replaceAll('Exception: ', ''), textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            ElevatedButton(onPressed: () => ref.read(ordersProvider.notifier).fetchInitial(), child: const Text('Coba Lagi')),
+          ],
+        ),
+      );
+    }
+
+    if (orderState.isLoading && orderState.orders.isEmpty) {
+      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+    }
+
+    final results = orderState.orders;
+
+    if (results.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.receipt_long_rounded, size: 80, color: AppColors.textHint),
+            const SizedBox(height: 24),
+            Text('Belum Ada Pesanan', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+            const SizedBox(height: 8),
+            Text('Ayo mulai belanja dan penuhi kulkasmu!', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: () => context.go('/'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+              ),
+              child: const Text('Mulai Belanja'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      color: AppColors.primary,
+      backgroundColor: Colors.white,
+      onRefresh: () => ref.read(ordersProvider.notifier).fetchInitial(),
+      child: ListView.separated(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(20),
+        itemCount: results.length + (orderState.nextUrl != null ? 1 : 0),
+        separatorBuilder: (context, index) => const SizedBox(height: 16),
+        itemBuilder: (context, index) {
+          if (index == results.length) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: CircularProgressIndicator(color: AppColors.primary),
+              ),
+            );
+          }
+
+          final order = results[index];
+          final String publicId = order['public_id'];
+          final String status = order['status'] ?? 'Unknown';
+          final int totalPrice = order['total_price'] ?? 0;
+          final DateTime createdAt = DateTime.tryParse(order['created_at'] ?? '') ?? DateTime.now();
+
+          return InkWell(
+            onTap: () => context.push('/orders/$publicId'),
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.schedule_rounded, size: 14, color: AppColors.textHint),
+                          const SizedBox(width: 4),
+                          Text(
+                            DateFormat('dd MMM yyyy, HH:mm').format(createdAt),
+                            style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w500, color: AppColors.textSecondary),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: _getStatusColor(status).withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          _translateStatus(status),
+                          style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: _getStatusColor(status)),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: Divider(color: AppColors.border, height: 1),
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: AppColors.background, 
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: const Icon(Icons.shopping_cart_outlined, color: AppColors.primary, size: 24),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Order ID', style: GoogleFonts.inter(fontSize: 11, color: AppColors.textHint)),
+                            const SizedBox(height: 2),
+                            Text(
+                              publicId.split('-').first.toUpperCase(),
+                              style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.textPrimary),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text('Total Belanja', style: GoogleFonts.inter(fontSize: 11, color: AppColors.textHint)),
+                          const SizedBox(height: 2),
+                          Text(
+                            CurrencyFormat.convertToIdr(totalPrice),
+                            style: GoogleFonts.inter(fontWeight: FontWeight.w800, fontSize: 15, color: AppColors.primaryDark),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final ordersAsync = ref.watch(ordersProvider);
+  Widget build(BuildContext context) {
+    final orderState = ref.watch(ordersProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -75,25 +334,21 @@ class OrderListScreen extends ConsumerWidget {
         ),
         centerTitle: false,
         actions: [
-          ordersAsync.when(
-            data: (_) => IconButton(
-              icon: const Icon(Icons.refresh_rounded, color: AppColors.textPrimary),
-              onPressed: () => ref.invalidate(ordersProvider),
-              tooltip: 'Muat Ulang',
-            ),
-            loading: () => const Padding(
+          if (orderState.isLoading && orderState.orders.isNotEmpty)
+            const Padding(
               padding: EdgeInsets.all(14),
               child: SizedBox(
                 width: 20,
                 height: 20,
                 child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
               ),
-            ),
-            error: (_, __) => IconButton(
+            )
+          else
+            IconButton(
               icon: const Icon(Icons.refresh_rounded, color: AppColors.textPrimary),
-              onPressed: () => ref.invalidate(ordersProvider),
+              onPressed: () => ref.read(ordersProvider.notifier).fetchInitial(),
+              tooltip: 'Muat Ulang',
             ),
-          ),
           const SizedBox(width: 4),
         ],
       ),
@@ -110,6 +365,8 @@ class OrderListScreen extends ConsumerWidget {
         unselectedItemColor: AppColors.textHint,
         showSelectedLabels: true,
         showUnselectedLabels: true,
+        selectedFontSize: 10,
+        unselectedFontSize: 10,
         selectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700),
         unselectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w500),
         elevation: 20,
@@ -117,153 +374,10 @@ class OrderListScreen extends ConsumerWidget {
           BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Beranda'),
           BottomNavigationBarItem(icon: Icon(Icons.receipt_long_rounded), label: 'Pesanan'),
           BottomNavigationBarItem(icon: Icon(Icons.shopping_cart_outlined), label: 'Keranjang'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: 'Profil'),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline_rounded), label: 'Profil'),
         ],
       ),
-      body: ordersAsync.when(
-        data: (data) {
-          final results = data['results'] as List? ?? [];
-
-          if (results.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.receipt_long_rounded, size: 80, color: AppColors.textHint),
-                  const SizedBox(height: 24),
-                  Text('Belum Ada Pesanan', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-                  const SizedBox(height: 8),
-                  Text('Ayo mulai belanja dan penuhi kulkasmu!', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
-                  const SizedBox(height: 32),
-                  ElevatedButton(
-                    onPressed: () => context.go('/'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                    ),
-                    child: const Text('Mulai Belanja'),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () => ref.refresh(ordersProvider.future),
-            child: ListView.separated(
-              padding: const EdgeInsets.all(20),
-              itemCount: results.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 16),
-              itemBuilder: (context, index) {
-                final order = results[index];
-                final String publicId = order['public_id'];
-                final String status = order['status'] ?? 'Unknown';
-                final int totalPrice = order['total_price'] ?? 0;
-                final DateTime createdAt = DateTime.tryParse(order['created_at'] ?? '') ?? DateTime.now();
-
-                return InkWell(
-                  onTap: () => context.push('/orders/$publicId'),
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.schedule_rounded, size: 14, color: AppColors.textHint),
-                                const SizedBox(width: 4),
-                                Text(
-                                  DateFormat('dd MMM yyyy, HH:mm').format(createdAt),
-                                  style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w500, color: AppColors.textSecondary),
-                                ),
-                              ],
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: _getStatusColor(status).withOpacity(0.12),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                _translateStatus(status),
-                                style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w700, color: _getStatusColor(status)),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                          child: Divider(color: AppColors.border, height: 1),
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              width: 52,
-                              height: 52,
-                              decoration: BoxDecoration(
-                                color: AppColors.background, 
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: AppColors.border),
-                              ),
-                              child: const Icon(Icons.shopping_cart_outlined, color: AppColors.primary, size: 24),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Order ID', style: GoogleFonts.inter(fontSize: 11, color: AppColors.textHint)),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    publicId.split('-').first.toUpperCase(),
-                                    style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.textPrimary),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text('Total Belanja', style: GoogleFonts.inter(fontSize: 11, color: AppColors.textHint)),
-                                const SizedBox(height: 2),
-                                Text(
-                                  CurrencyFormat.convertToIdr(totalPrice),
-                                  style: GoogleFonts.inter(fontWeight: FontWeight.w800, fontSize: 15, color: AppColors.primaryDark),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline_rounded, size: 50, color: AppColors.error),
-              const SizedBox(height: 16),
-              Text(e.toString().replaceAll('Exception: ', ''), textAlign: TextAlign.center),
-              const SizedBox(height: 16),
-              ElevatedButton(onPressed: () => ref.invalidate(ordersProvider), child: const Text('Coba Lagi')),
-            ],
-          ),
-        ),
-      ),
+      body: _buildBody(orderState),
     );
   }
 }

@@ -41,22 +41,19 @@ class Product {
 
 class ProductPaginatedResponse {
   final int count;
-  final int totalPages;
-  final int currentPage;
+  final String? nextUrl;
   final List<Product> results;
 
   ProductPaginatedResponse({
     required this.count,
-    required this.totalPages,
-    required this.currentPage,
+    this.nextUrl,
     required this.results,
   });
 
   factory ProductPaginatedResponse.fromJson(Map<String, dynamic> json) {
     return ProductPaginatedResponse(
       count: json['count'] as int? ?? 0,
-      totalPages: json['total_pages'] as int? ?? 1,
-      currentPage: json['current_page'] as int? ?? 1,
+      nextUrl: json['next'] as String?,
       results: (json['results'] as List<dynamic>?)
               ?.map((item) => Product.fromJson(item as Map<String, dynamic>))
               .toList() ??

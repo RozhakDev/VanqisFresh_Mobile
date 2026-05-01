@@ -21,30 +21,26 @@ class ProductPaginationState {
   final List<Product> products;
   final bool isLoading;
   final String? error;
-  final int currentPage;
-  final bool hasMore;
+  final String? nextUrl;
 
   ProductPaginationState({
     this.products = const [],
     this.isLoading = false,
     this.error,
-    this.currentPage = 1,
-    this.hasMore = true,
+    this.nextUrl,
   });
 
   ProductPaginationState copyWith({
     List<Product>? products,
     bool? isLoading,
     String? error,
-    int? currentPage,
-    bool? hasMore,
+    String? nextUrl,
   }) {
     return ProductPaginationState(
       products: products ?? this.products,
       isLoading: isLoading ?? this.isLoading,
       error: error,
-      currentPage: currentPage ?? this.currentPage,
-      hasMore: hasMore ?? this.hasMore,
+      nextUrl: nextUrl ?? this.nextUrl,
     );
   }
 }
@@ -77,11 +73,10 @@ class ProductNotifier extends Notifier<ProductPaginationState> {
         categoryId: _currentCategoryId,
       );
 
-      state = state.copyWith(
+      state = ProductPaginationState(
         products: response.results,
         isLoading: false,
-        currentPage: 1,
-        hasMore: response.currentPage < response.totalPages,
+        nextUrl: response.nextUrl,
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
@@ -89,23 +84,19 @@ class ProductNotifier extends Notifier<ProductPaginationState> {
   }
 
   Future<void> fetchNextPage() async {
-    if (state.isLoading || !state.hasMore) return;
+    if (state.isLoading || state.nextUrl == null) return;
 
     state = state.copyWith(isLoading: true);
 
     try {
-      final nextPage = state.currentPage + 1;
       final response = await _repository.getProducts(
-        page: nextPage,
-        search: _currentSearch,
-        categoryId: _currentCategoryId,
+        nextUrl: state.nextUrl,
       );
 
-      state = state.copyWith(
+      state = ProductPaginationState(
         products: [...state.products, ...response.results],
         isLoading: false,
-        currentPage: nextPage,
-        hasMore: response.currentPage < response.totalPages,
+        nextUrl: response.nextUrl,
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());

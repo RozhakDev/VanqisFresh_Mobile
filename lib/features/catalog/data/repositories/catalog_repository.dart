@@ -30,17 +30,23 @@ class CatalogRepository {
   }
 
   Future<ProductPaginatedResponse> getProducts({
+    String? nextUrl,
     int page = 1,
     String? search,
     int? categoryId,
   }) async {
     try {
+      if (nextUrl != null) {
+        final response = await _dio.get(nextUrl);
+        return ProductPaginatedResponse.fromJson(response.data);
+      }
+
       final Map<String, dynamic> queryParams = {'page': page};
       if (search != null && search.isNotEmpty) queryParams['search'] = search;
       if (categoryId != null) queryParams['category'] = categoryId;
-    queryParams['is_available'] = true;
+      queryParams['is_available'] = true;
 
-    final response = await _dio.get('/catalog/products/', queryParameters: queryParams);
+      final response = await _dio.get('/catalog/products/', queryParameters: queryParams);
       return ProductPaginatedResponse.fromJson(response.data);
     } on DioException catch (e) {
       throw ApiException.fromDioError(e);
