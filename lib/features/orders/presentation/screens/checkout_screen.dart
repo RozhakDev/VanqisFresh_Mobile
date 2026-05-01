@@ -69,7 +69,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
     final user = ref.read(authProvider).user;
     if (user == null) {
-      SnackbarUtils.show(context, 'Sesi telah habis, silakan login ulang.', type: SnackbarType.error);
+      SnackbarUtils.show(context, 'Sesi berakhir. Silakan masuk kembali.', type: SnackbarType.error);
       return;
     }
 
@@ -286,7 +286,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                                 if (item.quantity < item.product.stock) {
                                                   ref.read(cartProvider.notifier).updateQuantity(item.product.id, item.quantity + 1);
                                                 } else {
-                                                  SnackbarUtils.show(context, 'Maksimal stok tercapai', type: SnackbarType.warning);
+                                                  SnackbarUtils.show(context, 'Jumlah melebihi stok tersedia.', type: SnackbarType.warning);
                                                 }
                                               },
                                               child: Container(

@@ -5,25 +5,7 @@ import '../theme/app_theme.dart';
 enum SnackbarType { success, error, info, warning }
 
 class SnackbarUtils {
-  static Color _foregroundFor(Color background) {
-    final brightness = ThemeData.estimateBrightnessForColor(background);
-    return brightness == Brightness.dark ? Colors.white : AppColors.textPrimary;
-  }
-
-  static SnackBarAction? _actionWithForeground(
-    SnackBarAction? action,
-    Color foreground,
-  ) {
-    if (action == null) return null;
-    if (action.textColor != null && action.disabledTextColor != null) return action;
-
-    return SnackBarAction(
-      label: action.label,
-      onPressed: action.onPressed,
-      textColor: action.textColor ?? foreground,
-      disabledTextColor: action.disabledTextColor ?? foreground.withValues(alpha: 0.55),
-    );
-  }
+  static OverlayEntry? _currentEntry;
 
   static void show(
     BuildContext context,
@@ -32,61 +14,139 @@ class SnackbarUtils {
     SnackBarAction? action,
     Duration duration = const Duration(seconds: 3),
   }) {
-    Color bgColor;
+    Color accentColor;
     IconData icon;
 
     switch (type) {
       case SnackbarType.success:
-        bgColor = AppColors.success;
+        accentColor = AppColors.success;
         icon = Icons.check_circle_outline_rounded;
         break;
       case SnackbarType.error:
-        bgColor = AppColors.error;
+        accentColor = AppColors.error;
         icon = Icons.error_outline_rounded;
         break;
       case SnackbarType.warning:
-        bgColor = AppColors.warning;
+        accentColor = AppColors.accentOrange;
         icon = Icons.warning_amber_rounded;
         break;
       case SnackbarType.info:
       default:
-        bgColor = AppColors.info;
+        accentColor = AppColors.accentBlue;
         icon = Icons.info_outline_rounded;
         break;
     }
 
-    final fgColor = _foregroundFor(bgColor);
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    scaffoldMessenger.clearSnackBars();
-    scaffoldMessenger.showSnackBar(
-      SnackBar(
-        content: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(icon, color: fgColor, size: 24),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                message.replaceAll('\n', ' '),
-                style: GoogleFonts.inter(
-                  color: fgColor,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  height: 1.3,
+    _currentEntry?.remove();
+    _currentEntry = null;
+
+    final overlay = Overlay.of(context);
+    final mediaQuery = MediaQuery.of(context);
+    final topOffset = mediaQuery.padding.top + 12;
+
+    late final OverlayEntry entry;
+    entry = OverlayEntry(
+      builder: (overlayContext) {
+        return Positioned(
+          top: topOffset,
+          left: 16,
+          right: 16,
+          child: SafeArea(
+            top: false,
+            bottom: false,
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: -10, end: 0),
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              builder: (context, offsetY, child) {
+                return Transform.translate(
+                  offset: Offset(0, offsetY),
+                  child: child,
+                );
+              },
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  constraints: const BoxConstraints(minHeight: 52),
+                  padding: const EdgeInsets.fromLTRB(12, 10, 14, 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.border),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.textPrimary.withValues(alpha: 0.08),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: accentColor.withValues(alpha: 0.10),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(icon, color: accentColor, size: 18),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          message.replaceAll('\n', ' '),
+                          style: GoogleFonts.inter(
+                            color: AppColors.textPrimary,
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w500,
+                            height: 1.35,
+                          ),
+                        ),
+                      ),
+                      if (action != null) ...[
+                        const SizedBox(width: 8),
+                        TextButton(
+                          onPressed: () {
+                            entry.remove();
+                            if (identical(_currentEntry, entry)) {
+                              _currentEntry = null;
+                            }
+                            action.onPressed();
+                          },
+                          style: TextButton.styleFrom(
+                            minimumSize: const Size(0, 36),
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            foregroundColor: accentColor,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            textStyle: GoogleFonts.inter(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.1,
+                            ),
+                          ),
+                          child: Text(action.label),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ],
-        ),
-        backgroundColor: bgColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        elevation: 6,
-        duration: duration,
-        action: _actionWithForeground(action, fgColor),
-      ),
+          ),
+        );
+      },
     );
+
+    _currentEntry = entry;
+    overlay.insert(entry);
+
+    Future.delayed(duration, () {
+      if (identical(_currentEntry, entry)) {
+        entry.remove();
+        _currentEntry = null;
+      }
+    });
   }
 }

@@ -55,7 +55,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   Future<void> _verifyOtp() async {
     final otp = _otpController.text.trim();
     if (otp.length < 6) {
-      SnackbarUtils.show(context, 'Kode OTP tidak lengkap', type: SnackbarType.error);
+      SnackbarUtils.show(context, 'Kode verifikasi belum lengkap.', type: SnackbarType.error);
       return;
     }
 
@@ -64,7 +64,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     try {
       await ref.read(authRepositoryProvider).verifyEmail(widget.email, otp);
       if (!mounted) return;
-      SnackbarUtils.show(context, 'Verifikasi Berhasil! Silakan Login.', type: SnackbarType.success);
+      SnackbarUtils.show(context, 'Verifikasi berhasil! Silakan masuk.', type: SnackbarType.success);
       context.go('/login');
     } catch (e) {
       if (!mounted) return;
@@ -81,7 +81,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     try {
       await ref.read(authRepositoryProvider).resendOtp(widget.email);
       if (!mounted) return;
-      SnackbarUtils.show(context, 'Kode OTP telah dikirim ulang ke ${widget.email}', type: SnackbarType.success);
+      SnackbarUtils.show(context, 'Kode verifikasi telah dikirim ulang.', type: SnackbarType.success);
       _startTimer();
     } catch (e) {
       if (!mounted) return;

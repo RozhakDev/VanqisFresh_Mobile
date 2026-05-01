@@ -60,7 +60,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!mounted) return;
 
     if (success) {
-      SnackbarUtils.show(context, 'Login berhasil!', type: SnackbarType.success);
+      SnackbarUtils.show(context, 'Berhasil masuk!', type: SnackbarType.success);
       context.go('/'); 
     }
   }
@@ -72,7 +72,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         if (next.error!.startsWith('UNVERIFIED:')) {
           final unverifiedEmail = next.error!.split(':')[1];
           ref.read(authProvider.notifier).clearError();
-          SnackbarUtils.show(context, 'Email belum diverifikasi. Mengalihkan ke halaman OTP...', type: SnackbarType.warning);
+          SnackbarUtils.show(context, 'Email belum diverifikasi. Lanjut ke verifikasi!', type: SnackbarType.warning);
           context.go('/verify-email?email=$unverifiedEmail');
           return;
         }

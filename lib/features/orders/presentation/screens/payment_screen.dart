@@ -29,11 +29,20 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
+    try {
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+      if (pickedFile != null) {
+        setState(() {
+          _selectedImage = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      SnackbarUtils.show(
+        context,
+        'Gagal memilih gambar. Periksa izin galeri lalu coba lagi.',
+        type: SnackbarType.error,
+      );
     }
   }
 
@@ -46,7 +55,11 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
       await ref.read(orderRepositoryProvider).uploadPaymentProof(widget.publicId, _selectedImage!.path);
       
       if (!mounted) return;
-      SnackbarUtils.show(context, 'Pembayaran berhasil dikonfirmasi!', type: SnackbarType.success);
+      SnackbarUtils.show(
+        context,
+        'Bukti pembayaran berhasil diunggah. Menunggu verifikasi admin.',
+        type: SnackbarType.success,
+      );
       
       context.go('/');
     } catch (e) {

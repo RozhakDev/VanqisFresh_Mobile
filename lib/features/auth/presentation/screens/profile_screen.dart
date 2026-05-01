@@ -69,7 +69,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   void _onLogout() {
     ref.read(authProvider.notifier).logout();
-    SnackbarUtils.show(context, 'Berhasil keluar', type: SnackbarType.success);
+    SnackbarUtils.show(context, 'Berhasil keluar!', type: SnackbarType.success);
     context.go('/login');
   }
 
