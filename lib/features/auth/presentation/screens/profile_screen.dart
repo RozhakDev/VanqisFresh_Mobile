@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:vanqisfresh/core/widgets/main_bottom_nav_bar.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/snackbar_utils.dart';
@@ -139,29 +140,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           const SizedBox(width: 8),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 3,
-        onTap: (index) {
-          if (index == 0) context.go('/');
-          if (index == 1) context.go('/orders');
-          if (index == 2) context.go('/checkout');
-        },
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.textHint,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        selectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700),
-        unselectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w500),
-        elevation: 20,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Beranda'),
-          BottomNavigationBarItem(icon: Icon(Icons.receipt_long_rounded), label: 'Pesanan'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart_outlined), label: 'Keranjang'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: 'Profil'),
-        ],
-      ),
+      bottomNavigationBar: MainBottomNavBar(currentIndex: 3),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),

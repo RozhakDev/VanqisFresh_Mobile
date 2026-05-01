@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/main_bottom_nav_bar.dart';
 import '../providers/catalog_provider.dart';
 import '../widgets/product_card.dart';
 import '../widgets/promo_banner_carousel.dart';
@@ -68,29 +68,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       child: Scaffold(
         backgroundColor: AppColors.background,
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: 0,
-          onTap: (index) {
-            if (index == 1) context.go('/orders');
-            if (index == 2) context.go('/checkout');
-            if (index == 3) context.go('/profile');
-          },
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor: AppColors.textHint,
-          showSelectedLabels: true,
-          showUnselectedLabels: true,
-          selectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700),
-          unselectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w500),
-          elevation: 20,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Beranda'),
-            BottomNavigationBarItem(icon: Icon(Icons.receipt_long_rounded), label: 'Pesanan'),
-            BottomNavigationBarItem(icon: Icon(Icons.shopping_cart_outlined), label: 'Keranjang'),
-            BottomNavigationBarItem(icon: Icon(Icons.person_outline_rounded), label: 'Profil'),
-          ],
-        ),
+        bottomNavigationBar: MainBottomNavBar(currentIndex: 0),
         body: RefreshIndicator(
           onRefresh: () async =>
               ref.read(productsProvider.notifier).fetchInitialProducts(),

@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/widgets/main_bottom_nav_bar.dart';
 import '../../data/repositories/order_repository.dart';
 
 class OrderPaginationState {
@@ -275,7 +276,7 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: AppColors.border),
                         ),
-                        child: const Icon(Icons.shopping_cart_outlined, color: AppColors.primary, size: 24),
+                        child: const Icon(Icons.shopping_cart_outlined, color: AppColors.primaryDark, size: 24),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -352,31 +353,7 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
           const SizedBox(width: 4),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1,
-        onTap: (index) {
-          if (index == 0) context.go('/');
-          if (index == 2) context.go('/checkout');
-          if (index == 3) context.go('/profile');
-        },
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.textHint,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        selectedFontSize: 10,
-        unselectedFontSize: 10,
-        selectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700),
-        unselectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w500),
-        elevation: 20,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Beranda'),
-          BottomNavigationBarItem(icon: Icon(Icons.receipt_long_rounded), label: 'Pesanan'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart_outlined), label: 'Keranjang'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline_rounded), label: 'Profil'),
-        ],
-      ),
+      bottomNavigationBar: MainBottomNavBar(currentIndex: 1),
       body: _buildBody(orderState),
     );
   }
