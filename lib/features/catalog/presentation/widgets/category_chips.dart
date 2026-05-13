@@ -5,23 +5,38 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/models/category.dart';
 
+/// Menampilkan komponen UI untuk kebutuhan halaman terkait.
+///
+/// Komponen ini membantu menyusun tampilan agar konsisten dan mudah digunakan.
 class CategoryChips extends ConsumerStatefulWidget {
   final List<Category> categories;
   final ValueChanged<int?> onCategorySelected;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat CategoryChips perlu dibuat dengan nilai awal.
   const CategoryChips({
     super.key,
     required this.categories,
     required this.onCategorySelected,
   });
 
+  /// Membuat state yang mengelola perilaku widget.
+  ///
+  /// State ini menyimpan interaksi dan perubahan lokal widget.
   @override
   ConsumerState<CategoryChips> createState() => _CategoryChipsState();
 }
 
+/// Menyimpan state yang dibutuhkan fitur terkait.
+///
+/// Data ini dipakai untuk menentukan tampilan dan proses fitur.
 class _CategoryChipsState extends ConsumerState<CategoryChips> {
   int? _selectedId;
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -55,6 +70,9 @@ class _CategoryChipsState extends ConsumerState<CategoryChips> {
     );
   }
 
+  /// Menampilkan chip kategori dengan status pilihan saat ini.
+  ///
+  /// Dipakai untuk memilih filter kategori.
   Widget _buildChip({
     required String label,
     required bool isSelected,

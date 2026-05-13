@@ -12,11 +12,20 @@ import '../../domain/models/product.dart';
 import '../../../orders/presentation/providers/cart_provider.dart';
 import 'product_image_placeholder.dart';
 
+/// Menampilkan komponen UI untuk kebutuhan halaman terkait.
+///
+/// Komponen ini membantu menyusun tampilan agar konsisten dan mudah digunakan.
 class ProductCard extends ConsumerWidget {
   final Product product;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat ProductCard perlu dibuat dengan nilai awal.
   const ProductCard({super.key, required this.product});
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isAvailable = product.isAvailable && product.stock > 0;
@@ -143,6 +152,9 @@ class ProductCard extends ConsumerWidget {
   }
 }
 
+/// Menampilkan komponen UI untuk kebutuhan halaman terkait.
+///
+/// Komponen ini membantu menyusun tampilan agar konsisten dan mudah digunakan.
 class _AddToCartButton extends StatefulWidget {
   final Product product;
   final bool isAvailable;
@@ -156,16 +168,25 @@ class _AddToCartButton extends StatefulWidget {
     required this.context,
   });
 
+  /// Membuat state yang mengelola perilaku widget.
+  ///
+  /// State ini menyimpan interaksi dan perubahan lokal widget.
   @override
   State<_AddToCartButton> createState() => _AddToCartButtonState();
 }
 
+/// Menyimpan state yang dibutuhkan fitur terkait.
+///
+/// Data ini dipakai untuk menentukan tampilan dan proses fitur.
 class _AddToCartButtonState extends State<_AddToCartButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _animController;
   late Animation<double> _scaleAnim;
   bool _added = false;
 
+  /// Menyiapkan state awal saat widget dibuat.
+  ///
+  /// Digunakan untuk inisialisasi sebelum tampilan pertama dirender.
   @override
   void initState() {
     super.initState();
@@ -178,12 +199,18 @@ class _AddToCartButtonState extends State<_AddToCartButton>
     );
   }
 
+  /// Membersihkan resource saat widget tidak lagi digunakan.
+  ///
+  /// Dipanggil untuk melepas controller, listener, atau timer.
   @override
   void dispose() {
     _animController.dispose();
     super.dispose();
   }
 
+  /// Menangani aksi tambah produk dari kartu produk.
+  ///
+  /// Dipakai saat pengguna menekan tombol keranjang.
   void _onTap() async {
     if (!widget.isAvailable) return;
 
@@ -216,6 +243,9 @@ class _AddToCartButtonState extends State<_AddToCartButton>
     if (mounted) setState(() => _added = false);
   }
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     if (!widget.isAvailable) {

@@ -1,10 +1,19 @@
 import 'package:dio/dio.dart';
 
+/// Mewakili error aplikasi dengan pesan yang mudah dipahami pengguna.
+///
+/// Digunakan untuk menyederhanakan error dari request API.
 class ApiException implements Exception {
   final String message;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat ApiException perlu dibuat dengan nilai awal.
   ApiException(this.message);
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat ApiException perlu dibuat dengan nilai awal.
   factory ApiException.fromDioError(DioException dioError) {
     switch (dioError.type) {
       case DioExceptionType.cancel:
@@ -22,6 +31,9 @@ class ApiException implements Exception {
     }
   }
 
+  /// Mengubah kode status API menjadi pesan yang mudah dipahami.
+  ///
+  /// Pesan ini ditampilkan saat request gagal.
   static String _handleStatusCode(int? statusCode) {
     switch (statusCode) {
       case 400:
@@ -37,6 +49,9 @@ class ApiException implements Exception {
     }
   }
 
+  /// Menghasilkan pesan error dalam bentuk teks.
+  ///
+  /// Digunakan saat exception perlu ditampilkan sebagai string.
   @override
   String toString() => message;
 }

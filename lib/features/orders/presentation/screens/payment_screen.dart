@@ -14,20 +14,35 @@ final paymentMethodsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) 
   return ref.watch(orderRepositoryProvider).getPaymentMethods();
 });
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class PaymentScreen extends ConsumerStatefulWidget {
   final String publicId;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat PaymentScreen perlu dibuat dengan nilai awal.
   const PaymentScreen({super.key, required this.publicId});
 
+  /// Membuat state yang mengelola perilaku widget.
+  ///
+  /// State ini menyimpan interaksi dan perubahan lokal widget.
   @override
   ConsumerState<PaymentScreen> createState() => _PaymentScreenState();
 }
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   File? _selectedImage;
   bool _isUploading = false;
   final ImagePicker _picker = ImagePicker();
 
+  /// Membuka pemilih gambar untuk bukti pembayaran.
+  ///
+  /// File yang dipilih akan dipakai saat upload bukti.
   Future<void> _pickImage() async {
     try {
       final pickedFile = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
@@ -46,6 +61,9 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     }
   }
 
+  /// Mengunggah bukti pembayaran ke server.
+  ///
+  /// Dipakai setelah pengguna memilih gambar bukti.
   Future<void> _uploadProof() async {
     if (_selectedImage == null) return;
 
@@ -70,6 +88,9 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     }
   }
 
+  /// Menampilkan gambar dalam dialog yang bisa diperbesar.
+  ///
+  /// Digunakan agar bukti pembayaran mudah diperiksa.
   void _showZoomableImage(BuildContext context, String imageUrl) {
     showDialog(
       context: context,
@@ -118,6 +139,9 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     );
   }
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     final paymentsAsync = ref.watch(paymentMethodsProvider);

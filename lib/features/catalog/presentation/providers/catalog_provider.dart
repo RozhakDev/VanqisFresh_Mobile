@@ -17,12 +17,18 @@ final productDetailProvider = FutureProvider.family<Product, int>((ref, productI
   return ref.watch(catalogRepositoryProvider).getProductDetail(productId);
 });
 
+/// Menyimpan state yang dibutuhkan fitur terkait.
+///
+/// Data ini dipakai untuk menentukan tampilan dan proses fitur.
 class ProductPaginationState {
   final List<Product> products;
   final bool isLoading;
   final String? error;
   final String? nextUrl;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat ProductPaginationState perlu dibuat dengan nilai awal.
   ProductPaginationState({
     this.products = const [],
     this.isLoading = false,
@@ -30,6 +36,9 @@ class ProductPaginationState {
     this.nextUrl,
   });
 
+  /// Membuat salinan data dengan nilai yang dapat diperbarui.
+  ///
+  /// Membantu menjaga perubahan state tetap aman dan terarah.
   ProductPaginationState copyWith({
     List<Product>? products,
     bool? isLoading,
@@ -49,11 +58,17 @@ final productsProvider = NotifierProvider<ProductNotifier, ProductPaginationStat
   return ProductNotifier();
 });
 
+/// Mengelola state dan aksi untuk fitur terkait.
+///
+/// Notifier ini memperbarui state berdasarkan interaksi atau hasil request.
 class ProductNotifier extends Notifier<ProductPaginationState> {
   late CatalogRepository _repository;
   String? _currentSearch;
   int? _currentCategoryId;
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   ProductPaginationState build() {
     _repository = ref.watch(catalogRepositoryProvider);
@@ -61,6 +76,9 @@ class ProductNotifier extends Notifier<ProductPaginationState> {
     return ProductPaginationState();
   }
 
+  /// Memuat daftar produk awal berdasarkan filter aktif.
+  ///
+  /// Dipakai saat katalog pertama kali dibuka atau filter berubah.
   Future<void> fetchInitialProducts({String? search, int? categoryId}) async {
     _currentSearch = search;
     _currentCategoryId = categoryId;
@@ -83,6 +101,9 @@ class ProductNotifier extends Notifier<ProductPaginationState> {
     }
   }
 
+  /// Memuat halaman berikutnya saat data masih tersedia.
+  ///
+  /// Digunakan untuk mendukung paginasi saat pengguna menggulir.
   Future<void> fetchNextPage() async {
     if (state.isLoading || state.nextUrl == null) return;
 

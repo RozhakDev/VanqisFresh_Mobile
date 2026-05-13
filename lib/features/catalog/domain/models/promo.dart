@@ -1,5 +1,8 @@
 import 'product.dart';
 
+/// Merepresentasikan data promo yang ditampilkan aplikasi.
+///
+/// Promo digunakan pada banner dan daftar produk promo.
 class Promo {
   final int id;
   final String title;
@@ -7,6 +10,9 @@ class Promo {
   final List<Product> products;
   final bool isActive;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat Promo perlu dibuat dengan nilai awal.
   Promo({
     required this.id,
     required this.title,
@@ -15,6 +21,9 @@ class Promo {
     required this.isActive,
   });
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat Promo perlu dibuat dengan nilai awal.
   factory Promo.fromJson(Map<String, dynamic> json) {
     return Promo(
       id: json['id'] as int,

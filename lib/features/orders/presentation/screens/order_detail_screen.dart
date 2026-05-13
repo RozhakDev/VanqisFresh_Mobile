@@ -14,11 +14,20 @@ final orderDetailProvider = FutureProvider.family.autoDispose<Map<String, dynami
   return ref.watch(orderRepositoryProvider).getOrderDetail(publicId);
 });
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class OrderDetailScreen extends ConsumerWidget {
   final String publicId;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat OrderDetailScreen perlu dibuat dengan nilai awal.
   const OrderDetailScreen({super.key, required this.publicId});
 
+  /// Menentukan warna yang sesuai dengan status pesanan.
+  ///
+  /// Warna membantu pengguna mengenali kondisi pesanan.
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -37,6 +46,9 @@ class OrderDetailScreen extends ConsumerWidget {
     }
   }
 
+  /// Menerjemahkan status pesanan ke teks yang mudah dipahami.
+  ///
+  /// Dipakai agar label status lebih ramah untuk pengguna.
   String _translateStatus(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -58,6 +70,9 @@ class OrderDetailScreen extends ConsumerWidget {
     }
   }
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(orderDetailProvider(publicId));
@@ -372,6 +387,9 @@ class OrderDetailScreen extends ConsumerWidget {
     );
   }
 
+  /// Menampilkan baris informasi dengan label dan nilai.
+  ///
+  /// Digunakan untuk merapikan detail pesanan.
   Widget _buildInfoRow(String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

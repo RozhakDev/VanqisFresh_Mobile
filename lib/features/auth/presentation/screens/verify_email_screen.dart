@@ -10,21 +10,36 @@ import '../../../../core/utils/snackbar_utils.dart';
 import '../providers/auth_provider.dart';
 import '../../data/repositories/auth_repository.dart';
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class VerifyEmailScreen extends ConsumerStatefulWidget {
   final String email;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat VerifyEmailScreen perlu dibuat dengan nilai awal.
   const VerifyEmailScreen({super.key, required this.email});
 
+  /// Membuat state yang mengelola perilaku widget.
+  ///
+  /// State ini menyimpan interaksi dan perubahan lokal widget.
   @override
   ConsumerState<VerifyEmailScreen> createState() => _VerifyEmailScreenState();
 }
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   final _otpController = TextEditingController();
   bool _isLoading = false;
   int _resendTimeout = 60;
   Timer? _timer;
 
+  /// Menyiapkan state awal saat widget dibuat.
+  ///
+  /// Digunakan untuk inisialisasi sebelum tampilan pertama dirender.
   @override
   void initState() {
     super.initState();
@@ -34,6 +49,9 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     });
   }
 
+  /// Membersihkan resource saat widget tidak lagi digunakan.
+  ///
+  /// Dipanggil untuk melepas controller, listener, atau timer.
   @override
   void dispose() {
     _otpController.dispose();
@@ -41,6 +59,9 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     super.dispose();
   }
 
+  /// Memulai timer sebelum OTP dapat dikirim ulang.
+  ///
+  /// Timer membantu membatasi aksi kirim ulang kode.
   void _startTimer() {
     setState(() => _resendTimeout = 60);
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -52,6 +73,9 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     });
   }
 
+  /// Memverifikasi OTP yang dimasukkan pengguna.
+  ///
+  /// Dipakai saat pengguna menyelesaikan verifikasi email.
   Future<void> _verifyOtp() async {
     final otp = _otpController.text.trim();
     if (otp.length < 6) {
@@ -74,6 +98,9 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     }
   }
 
+  /// Mengirim ulang kode OTP ke email pengguna.
+  ///
+  /// Digunakan saat pengguna meminta kode baru.
   Future<void> _resendOtp() async {
     if (_resendTimeout > 0) return;
     
@@ -91,6 +118,9 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     }
   }
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     return Scaffold(

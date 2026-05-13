@@ -7,13 +7,25 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../providers/auth_provider.dart';
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class LoginScreen extends ConsumerStatefulWidget {
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat LoginScreen perlu dibuat dengan nilai awal.
   const LoginScreen({super.key});
 
+  /// Membuat state yang mengelola perilaku widget.
+  ///
+  /// State ini menyimpan interaksi dan perubahan lokal widget.
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailCtrl = TextEditingController();
@@ -22,6 +34,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _obscurePassword = true;
   bool _messageShown = false;
 
+  /// Menyiapkan state awal saat widget dibuat.
+  ///
+  /// Digunakan untuk inisialisasi sebelum tampilan pertama dirender.
   @override
   void initState() {
     super.initState();
@@ -30,6 +45,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
   }
 
+  /// Memeriksa pesan dari route dan menampilkannya bila tersedia.
+  ///
+  /// Digunakan untuk memberi konteks setelah pengguna diarahkan.
   void _checkMessage() {
     if (!mounted || _messageShown) return;
     
@@ -40,6 +58,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  /// Membersihkan resource saat widget tidak lagi digunakan.
+  ///
+  /// Dipanggil untuk melepas controller, listener, atau timer.
   @override
   void dispose() {
     _emailCtrl.dispose();
@@ -47,6 +68,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  /// Menangani aksi pengguna saat login.
+  ///
+  /// Validasi dan request login dipicu dari method ini.
   void _onLogin() async {
     if (!_formKey.currentState!.validate()) return;
     
@@ -65,6 +89,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     ref.listen(authProvider, (previous, next) {
@@ -245,6 +272,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
+  /// Menampilkan label input dengan gaya yang konsisten.
+  ///
+  /// Dipakai oleh field form pada halaman terkait.
   Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8, left: 4),

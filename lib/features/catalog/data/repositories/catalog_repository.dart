@@ -12,11 +12,20 @@ final catalogRepositoryProvider = Provider<CatalogRepository>((ref) {
   return CatalogRepository(dio);
 });
 
+/// Mengelola akses data dan komunikasi dengan layanan terkait.
+///
+/// Class ini menjadi penghubung antara fitur dan sumber data.
 class CatalogRepository {
   final Dio _dio;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat CatalogRepository perlu dibuat dengan nilai awal.
   CatalogRepository(this._dio);
 
+  /// Mengambil daftar kategori dari server.
+  ///
+  /// Data ini digunakan untuk filter produk di katalog.
   Future<List<Category>> getCategories() async {
     try {
       final response = await _dio.get('/catalog/categories/');
@@ -29,6 +38,9 @@ class CatalogRepository {
     }
   }
 
+  /// Mengambil daftar produk dengan filter yang tersedia.
+  ///
+  /// Mendukung pencarian, kategori, dan paginasi katalog.
   Future<ProductPaginatedResponse> getProducts({
     String? nextUrl,
     int page = 1,
@@ -55,6 +67,9 @@ class CatalogRepository {
     }
   }
 
+  /// Mengambil daftar promo aktif dari server.
+  ///
+  /// Promo ditampilkan pada bagian penawaran di katalog.
   Future<List<Promo>> getPromos() async {
     try {
       final response = await _dio.get('/catalog/promos/');
@@ -67,6 +82,9 @@ class CatalogRepository {
     }
   }
 
+  /// Mengambil detail produk berdasarkan ID.
+  ///
+  /// Data detail dipakai pada halaman produk.
   Future<Product> getProductDetail(int id) async {
     try {
       final response = await _dio.get('/catalog/products/$id/');

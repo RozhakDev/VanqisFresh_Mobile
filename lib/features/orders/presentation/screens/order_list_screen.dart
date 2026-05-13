@@ -9,12 +9,18 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/main_bottom_nav_bar.dart';
 import '../../data/repositories/order_repository.dart';
 
+/// Menyimpan state yang dibutuhkan fitur terkait.
+///
+/// Data ini dipakai untuk menentukan tampilan dan proses fitur.
 class OrderPaginationState {
   final List<dynamic> orders;
   final bool isLoading;
   final String? nextUrl;
   final String? error;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat OrderPaginationState perlu dibuat dengan nilai awal.
   OrderPaginationState({
     this.orders = const [],
     this.isLoading = false,
@@ -22,6 +28,9 @@ class OrderPaginationState {
     this.error,
   });
 
+  /// Membuat salinan data dengan nilai yang dapat diperbarui.
+  ///
+  /// Membantu menjaga perubahan state tetap aman dan terarah.
   OrderPaginationState copyWith({
     List<dynamic>? orders,
     bool? isLoading,
@@ -37,13 +46,22 @@ class OrderPaginationState {
   }
 }
 
+/// Mengelola state dan aksi untuk fitur terkait.
+///
+/// Notifier ini memperbarui state berdasarkan interaksi atau hasil request.
 class OrderPaginationNotifier extends Notifier<OrderPaginationState> {
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   OrderPaginationState build() {
     Future.microtask(() => fetchInitial());
     return OrderPaginationState();
   }
 
+  /// Memuat daftar awal untuk ditampilkan.
+  ///
+  /// Dipakai saat halaman pertama kali membutuhkan data.
   Future<void> fetchInitial() async {
     state = state.copyWith(isLoading: true, error: null);
     try {
@@ -61,6 +79,9 @@ class OrderPaginationNotifier extends Notifier<OrderPaginationState> {
     }
   }
 
+  /// Memuat halaman berikutnya saat data masih tersedia.
+  ///
+  /// Digunakan untuk mendukung paginasi saat pengguna menggulir.
   Future<void> fetchNextPage() async {
     if (state.isLoading || state.nextUrl == null) return;
 
@@ -85,34 +106,58 @@ final ordersProvider = NotifierProvider<OrderPaginationNotifier, OrderPagination
   return OrderPaginationNotifier();
 });
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class OrderListScreen extends ConsumerStatefulWidget {
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat OrderListScreen perlu dibuat dengan nilai awal.
   const OrderListScreen({super.key});
 
+  /// Membuat state yang mengelola perilaku widget.
+  ///
+  /// State ini menyimpan interaksi dan perubahan lokal widget.
   @override
   ConsumerState<OrderListScreen> createState() => _OrderListScreenState();
 }
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class _OrderListScreenState extends ConsumerState<OrderListScreen> {
   final ScrollController _scrollController = ScrollController();
 
+  /// Menyiapkan state awal saat widget dibuat.
+  ///
+  /// Digunakan untuk inisialisasi sebelum tampilan pertama dirender.
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
   }
 
+  /// Membersihkan resource saat widget tidak lagi digunakan.
+  ///
+  /// Dipanggil untuk melepas controller, listener, atau timer.
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
   }
 
+  /// Menangani aksi pengguna saat menggulir daftar.
+  ///
+  /// Digunakan untuk memicu pemuatan data berikutnya.
   void _onScroll() {
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
       ref.read(ordersProvider.notifier).fetchNextPage();
     }
   }
 
+  /// Menentukan warna yang sesuai dengan status pesanan.
+  ///
+  /// Warna membantu pengguna mengenali kondisi pesanan.
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -131,6 +176,9 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
     }
   }
 
+  /// Menerjemahkan status pesanan ke teks yang mudah dipahami.
+  ///
+  /// Dipakai agar label status lebih ramah untuk pengguna.
   String _translateStatus(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
@@ -152,6 +200,9 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
     }
   }
 
+  /// Mengelola build body pada fitur terkait.
+  ///
+  /// Digunakan untuk menjaga alur fitur tetap jelas dan terstruktur.
   Widget _buildBody(OrderPaginationState orderState) {
     if (orderState.error != null && orderState.orders.isEmpty) {
       return Center(
@@ -353,6 +404,9 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
     );
   }
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     final orderState = ref.watch(ordersProvider);

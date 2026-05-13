@@ -7,13 +7,25 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../providers/auth_provider.dart';
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class RegisterScreen extends ConsumerStatefulWidget {
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat RegisterScreen perlu dibuat dengan nilai awal.
   const RegisterScreen({super.key});
 
+  /// Membuat state yang mengelola perilaku widget.
+  ///
+  /// State ini menyimpan interaksi dan perubahan lokal widget.
   @override
   ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _usernameCtrl = TextEditingController();
@@ -26,6 +38,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   bool _obscurePassword = true;
 
+  /// Membersihkan resource saat widget tidak lagi digunakan.
+  ///
+  /// Dipanggil untuk melepas controller, listener, atau timer.
   @override
   void dispose() {
     _usernameCtrl.dispose();
@@ -38,6 +53,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
+  /// Menangani aksi pengguna saat registrasi.
+  ///
+  /// Digunakan untuk validasi dan pengiriman data pendaftaran.
   void _onRegister() async {
     if (!_formKey.currentState!.validate()) return;
     
@@ -62,6 +80,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     ref.listen(authProvider, (previous, next) {
@@ -302,6 +323,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 
+  /// Menampilkan label input dengan gaya yang konsisten.
+  ///
+  /// Dipakai oleh field form pada halaman terkait.
   Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8, left: 4),

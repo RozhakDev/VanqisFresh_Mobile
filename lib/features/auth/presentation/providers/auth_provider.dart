@@ -8,9 +8,15 @@ final authProvider = NotifierProvider<AuthNotifier, AuthState>(() {
   return AuthNotifier();
 });
 
+/// Mengelola state dan aksi untuk fitur terkait.
+///
+/// Notifier ini memperbarui state berdasarkan interaksi atau hasil request.
 class AuthNotifier extends Notifier<AuthState> {
   late final AuthRepository _repository;
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   AuthState build() {
     _repository = ref.watch(authRepositoryProvider);
@@ -18,6 +24,9 @@ class AuthNotifier extends Notifier<AuthState> {
     return const AuthState();
   }
 
+  /// Menyiapkan sesi pengguna dari token yang tersimpan.
+  ///
+  /// Dipakai saat state autentikasi pertama kali dibuat.
   Future<void> _init() async {
     state = state.copyWith(isLoading: true);
     try {
@@ -33,6 +42,9 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
+  /// Memproses login pengguna dan mengembalikan hasilnya.
+  ///
+  /// Digunakan untuk membuka sesi pengguna di aplikasi.
   Future<bool> login(String email, String password) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
@@ -48,6 +60,9 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
+  /// Mengirim data pendaftaran pengguna baru.
+  ///
+  /// Digunakan untuk membuat akun sebelum pengguna masuk.
   Future<bool> register({
     required String username,
     required String password,
@@ -76,6 +91,9 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
+  /// Memperbarui data profil pengguna.
+  ///
+  /// Digunakan setelah pengguna menyimpan perubahan profil.
   Future<bool> updateProfile(Map<String, dynamic> data) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
@@ -88,11 +106,17 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
+  /// Mengakhiri sesi pengguna dan membersihkan state autentikasi.
+  ///
+  /// Dipakai saat pengguna keluar dari aplikasi.
   Future<void> logout() async {
     await _repository.clearTokens();
     state = const AuthState();
   }
 
+  /// Membersihkan pesan error dari state saat ini.
+  ///
+  /// Dipakai setelah error tidak lagi perlu ditampilkan.
   void clearError() {
     state = state.copyWith(clearError: true);
   }

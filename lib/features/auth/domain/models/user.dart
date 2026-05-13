@@ -1,3 +1,6 @@
+/// Merepresentasikan profil pengguna aplikasi.
+///
+/// Model ini dipakai untuk data akun yang sedang login.
 class User {
   final int id;
   final String username;
@@ -7,6 +10,9 @@ class User {
   final String phoneNumber;
   final String address;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat User perlu dibuat dengan nilai awal.
   User({
     required this.id,
     required this.username,
@@ -17,6 +23,9 @@ class User {
     required this.address,
   });
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat User perlu dibuat dengan nilai awal.
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'] as int,

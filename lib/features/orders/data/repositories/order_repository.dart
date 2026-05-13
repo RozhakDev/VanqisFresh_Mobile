@@ -6,11 +6,20 @@ final orderRepositoryProvider = Provider<OrderRepository>((ref) {
   return OrderRepository(ref.watch(dioProvider));
 });
 
+/// Mengelola akses data dan komunikasi dengan layanan terkait.
+///
+/// Class ini menjadi penghubung antara fitur dan sumber data.
 class OrderRepository {
   final Dio _dio;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat OrderRepository perlu dibuat dengan nilai awal.
   OrderRepository(this._dio);
 
+  /// Mengirim data checkout dan mengembalikan detail pembayaran.
+  ///
+  /// Digunakan saat pengguna menyelesaikan pesanan.
   Future<Map<String, dynamic>> checkout(String note, List<Map<String, dynamic>> items) async {
     try {
       final response = await _dio.post('/orders/checkout/', data: {
@@ -26,6 +35,9 @@ class OrderRepository {
     }
   }
 
+  /// Mengambil daftar metode pembayaran yang tersedia.
+  ///
+  /// Data ini ditampilkan saat pengguna perlu memilih pembayaran.
   Future<List<Map<String, dynamic>>> getPaymentMethods() async {
     try {
       final response = await _dio.get('/core/payments/');
@@ -40,6 +52,9 @@ class OrderRepository {
     }
   }
 
+  /// Mengunggah gambar bukti pembayaran untuk pesanan.
+  ///
+  /// Dipakai setelah pengguna menyelesaikan pembayaran manual.
   Future<void> uploadPaymentProof(String publicId, String filePath) async {
     try {
       final formData = FormData.fromMap({
@@ -58,6 +73,9 @@ class OrderRepository {
     }
   }
 
+  /// Mengambil nomor WhatsApp yang digunakan untuk checkout.
+  ///
+  /// Nomor ini dipakai untuk membuat pesan pesanan.
   Future<String> getWhatsAppContact() async {
     try {
       final response = await _dio.get('/core/contacts/');
@@ -85,6 +103,9 @@ class OrderRepository {
     }
   }
 
+  /// Mengambil daftar pesanan pengguna dari server.
+  ///
+  /// Data ini ditampilkan pada halaman riwayat pesanan.
   Future<Map<String, dynamic>> getOrders({String? nextUrl}) async {
     try {
       final response = await _dio.get(nextUrl ?? '/orders/');
@@ -97,6 +118,9 @@ class OrderRepository {
     }
   }
 
+  /// Mengambil detail pesanan berdasarkan public ID.
+  ///
+  /// Detail ini dipakai pada halaman informasi pesanan.
   Future<Map<String, dynamic>> getOrderDetail(String publicId) async {
     try {
       final response = await _dio.get('/orders/$publicId/');

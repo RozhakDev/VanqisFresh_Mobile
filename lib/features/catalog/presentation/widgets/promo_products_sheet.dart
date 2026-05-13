@@ -12,16 +12,25 @@ import '../../domain/models/product.dart';
 import '../../domain/models/promo.dart';
 import 'product_image_placeholder.dart';
 
+/// Merepresentasikan data utama yang digunakan pada fitur terkait.
+///
+/// Model ini membantu menjaga struktur data tetap jelas.
 class PromoProductsSheet extends ConsumerWidget {
   final Promo promo;
   final BuildContext hostContext;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat PromoProductsSheet perlu dibuat dengan nilai awal.
   const PromoProductsSheet({
     super.key,
     required this.promo,
     required this.hostContext,
   });
 
+  /// Menampilkan komponen sesuai konteks yang diberikan.
+  ///
+  /// Dipakai saat UI perlu dibuka dari lokasi lain.
   static Future<void> show(BuildContext context, Promo promo) {
     return showModalBottomSheet<void>(
       context: context,
@@ -32,6 +41,9 @@ class PromoProductsSheet extends ConsumerWidget {
     );
   }
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final availableProducts = promo.products
@@ -196,6 +208,9 @@ class PromoProductsSheet extends ConsumerWidget {
   }
 }
 
+/// Menampilkan komponen UI untuk kebutuhan halaman terkait.
+///
+/// Komponen ini membantu menyusun tampilan agar konsisten dan mudah digunakan.
 class _PromoProductTile extends ConsumerWidget {
   final Product product;
   final BuildContext hostContext;
@@ -205,6 +220,9 @@ class _PromoProductTile extends ConsumerWidget {
     required this.hostContext,
   });
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Container(
@@ -316,9 +334,15 @@ class _PromoProductTile extends ConsumerWidget {
   }
 }
 
+/// Menyimpan state yang dibutuhkan fitur terkait.
+///
+/// Data ini dipakai untuk menentukan tampilan dan proses fitur.
 class _PromoEmptyState extends StatelessWidget {
   const _PromoEmptyState();
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     return Center(

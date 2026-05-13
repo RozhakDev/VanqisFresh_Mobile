@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// Menyediakan kumpulan warna utama aplikasi.
+///
+/// Warna ini menjaga tampilan tetap konsisten.
 class AppColors {
   static const Color primary = Color(0xFFEAB308);
   static const Color primaryDark = Color(0xFF134E4A);
@@ -68,6 +71,9 @@ class AppColors {
   ];
 }
 
+/// Menyediakan konfigurasi tema utama aplikasi.
+///
+/// Tema ini digunakan oleh MaterialApp.
 class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(

@@ -14,9 +14,15 @@ import '../../features/orders/presentation/screens/order_list_screen.dart';
 import '../../features/orders/presentation/screens/order_detail_screen.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 
+/// Mengelola refresh router saat state autentikasi berubah.
+///
+/// Digunakan agar redirect route mengikuti sesi pengguna.
 class RouterNotifier extends ChangeNotifier {
   final Ref _ref;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat RouterNotifier perlu dibuat dengan nilai awal.
   RouterNotifier(this._ref) {
     _ref.listen(authProvider, (_, __) {
       notifyListeners();

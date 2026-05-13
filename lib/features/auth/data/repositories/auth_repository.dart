@@ -9,11 +9,20 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository(ref.watch(dioProvider));
 });
 
+/// Mengelola akses data dan komunikasi dengan layanan terkait.
+///
+/// Class ini menjadi penghubung antara fitur dan sumber data.
 class AuthRepository {
   final Dio _dio;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat AuthRepository perlu dibuat dengan nilai awal.
   AuthRepository(this._dio);
 
+  /// Mengirim data pendaftaran pengguna baru.
+  ///
+  /// Digunakan untuk membuat akun sebelum pengguna masuk.
   Future<void> register({
     required String username,
     required String password,
@@ -43,6 +52,9 @@ class AuthRepository {
     }
   }
 
+  /// Memverifikasi email pengguna dengan kode OTP.
+  ///
+  /// Dipakai untuk memastikan alamat email sudah aktif.
   Future<void> verifyEmail(String email, String otp) async {
     try {
       await _dio.post('/users/verify-email/', data: {
@@ -59,6 +71,9 @@ class AuthRepository {
     }
   }
 
+  /// Mengirim ulang kode OTP ke email pengguna.
+  ///
+  /// Digunakan saat pengguna meminta kode baru.
   Future<void> resendOtp(String email) async {
     try {
       await _dio.post('/users/resend-otp/', data: {
@@ -74,6 +89,9 @@ class AuthRepository {
     }
   }
 
+  /// Memproses login pengguna dan mengembalikan hasilnya.
+  ///
+  /// Digunakan untuk membuka sesi pengguna di aplikasi.
   Future<Map<String, String>> login(String email, String password) async {
     try {
       final response = await _dio.post('/users/login/', data: {
@@ -104,6 +122,9 @@ class AuthRepository {
     }
   }
 
+  /// Memuat profil pengguna yang sedang login.
+  ///
+  /// Data ini dipakai untuk menampilkan informasi akun.
   Future<User> fetchProfile() async {
     try {
       final response = await _dio.get('/users/profile/');
@@ -113,6 +134,9 @@ class AuthRepository {
     }
   }
 
+  /// Memperbarui data profil pengguna.
+  ///
+  /// Digunakan setelah pengguna menyimpan perubahan profil.
   Future<User> updateProfile(Map<String, dynamic> data) async {
     try {
       final response = await _dio.patch('/users/profile/', data: data);
@@ -127,18 +151,27 @@ class AuthRepository {
     }
   }
 
+  /// Menyimpan token sesi pengguna secara lokal.
+  ///
+  /// Token ini dipakai untuk request berikutnya.
   Future<void> saveTokens(String access, String refresh) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('access_token', access);
     await prefs.setString('refresh_token', refresh);
   }
 
+  /// Menghapus token sesi pengguna dari penyimpanan lokal.
+  ///
+  /// Dipakai saat sesi pengguna harus dibersihkan.
   Future<void> clearTokens() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('access_token');
     await prefs.remove('refresh_token');
   }
 
+  /// Memeriksa apakah token pengguna masih tersimpan.
+  ///
+  /// Hasilnya dipakai untuk menentukan status sesi pengguna.
   Future<bool> hasToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.containsKey('access_token');

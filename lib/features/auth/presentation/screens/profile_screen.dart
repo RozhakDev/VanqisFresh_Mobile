@@ -8,13 +8,25 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../providers/auth_provider.dart';
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class ProfileScreen extends ConsumerStatefulWidget {
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat ProfileScreen perlu dibuat dengan nilai awal.
   const ProfileScreen({super.key});
 
+  /// Membuat state yang mengelola perilaku widget.
+  ///
+  /// State ini menyimpan interaksi dan perubahan lokal widget.
   @override
   ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   
@@ -24,6 +36,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   late TextEditingController _emailCtrl;
   late TextEditingController _addressCtrl;
 
+  /// Menyiapkan state awal saat widget dibuat.
+  ///
+  /// Digunakan untuk inisialisasi sebelum tampilan pertama dirender.
   @override
   void initState() {
     super.initState();
@@ -36,6 +51,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     _addressCtrl = TextEditingController(text: user?.address ?? '');
   }
 
+  /// Membersihkan resource saat widget tidak lagi digunakan.
+  ///
+  /// Dipanggil untuk melepas controller, listener, atau timer.
   @override
   void dispose() {
     _firstNameCtrl.dispose();
@@ -46,6 +64,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     super.dispose();
   }
 
+  /// Menangani aksi pengguna saat memperbarui profil.
+  ///
+  /// Data form dikirim setelah validasi berhasil.
   void _onUpdateProfile() async {
     if (!_formKey.currentState!.validate()) return;
     
@@ -68,12 +89,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
+  /// Menangani aksi pengguna saat logout.
+  ///
+  /// Digunakan untuk menutup sesi pengguna dari halaman profil.
   void _onLogout() {
     ref.read(authProvider.notifier).logout();
     SnackbarUtils.show(context, 'Berhasil keluar!', type: SnackbarType.success);
     context.go('/login');
   }
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     ref.listen(authProvider, (previous, next) {
@@ -354,6 +381,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  /// Menampilkan label input dengan gaya yang konsisten.
+  ///
+  /// Dipakai oleh field form pada halaman terkait.
   Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8, left: 4),
@@ -368,6 +398,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  /// Menyiapkan dekorasi input agar tampil konsisten.
+  ///
+  /// Digunakan untuk menyamakan gaya form.
   InputDecoration _buildInputDecoration(String hint, IconData icon) {
     return InputDecoration(
       hintText: hint,

@@ -3,6 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
 
+/// Menampilkan komponen UI untuk kebutuhan halaman terkait.
+///
+/// Komponen ini membantu menyusun tampilan agar konsisten dan mudah digunakan.
 class SectionHeader extends StatelessWidget {
   final String title;
   final String? subtitle;
@@ -10,6 +13,9 @@ class SectionHeader extends StatelessWidget {
   final VoidCallback? onAction;
   final EdgeInsetsGeometry padding;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat SectionHeader perlu dibuat dengan nilai awal.
   const SectionHeader({
     super.key,
     required this.title,
@@ -19,6 +25,9 @@ class SectionHeader extends StatelessWidget {
     this.padding = const EdgeInsets.fromLTRB(16, 0, 16, 12),
   });
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     return Padding(

@@ -4,11 +4,20 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../theme/app_theme.dart';
 
+/// Menampilkan komponen UI untuk kebutuhan halaman terkait.
+///
+/// Komponen ini membantu menyusun tampilan agar konsisten dan mudah digunakan.
 class MainBottomNavBar extends StatelessWidget {
   final int currentIndex;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat MainBottomNavBar perlu dibuat dengan nilai awal.
   const MainBottomNavBar({super.key, required this.currentIndex});
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(

@@ -12,19 +12,34 @@ import '../widgets/category_chips.dart';
 import '../widgets/home_app_bar.dart';
 import '../widgets/products_section_header.dart';
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class HomeScreen extends ConsumerStatefulWidget {
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat HomeScreen perlu dibuat dengan nilai awal.
   const HomeScreen({super.key});
 
+  /// Membuat state yang mengelola perilaku widget.
+  ///
+  /// State ini menyimpan interaksi dan perubahan lokal widget.
   @override
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   bool _searchFocused = false;
   final FocusNode _searchFocusNode = FocusNode();
 
+  /// Menyiapkan state awal saat widget dibuat.
+  ///
+  /// Digunakan untuk inisialisasi sebelum tampilan pertama dirender.
   @override
   void initState() {
     super.initState();
@@ -34,6 +49,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
+  /// Membersihkan resource saat widget tidak lagi digunakan.
+  ///
+  /// Dipanggil untuk melepas controller, listener, atau timer.
   @override
   void dispose() {
     _scrollController.dispose();
@@ -42,6 +60,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
+  /// Menangani aksi pengguna saat menggulir daftar.
+  ///
+  /// Digunakan untuk memicu pemuatan data berikutnya.
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
@@ -49,12 +70,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  /// Menangani pencarian produk dari input pengguna.
+  ///
+  /// Dipakai untuk memperbarui daftar sesuai kata kunci.
   void _onSearch(String value) {
     ref
         .read(productsProvider.notifier)
         .fetchInitialProducts(search: value.isEmpty ? null : value);
   }
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     final productState = ref.watch(productsProvider);
@@ -184,6 +211,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
+/// Menampilkan komponen UI untuk kebutuhan halaman terkait.
+///
+/// Komponen ini membantu menyusun tampilan agar konsisten dan mudah digunakan.
 class _SearchBar extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
@@ -197,6 +227,9 @@ class _SearchBar extends StatelessWidget {
     required this.onSearch,
   });
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -263,9 +296,15 @@ class _SearchBar extends StatelessWidget {
   }
 }
 
+/// Menyimpan state yang dibutuhkan fitur terkait.
+///
+/// Data ini dipakai untuk menentukan tampilan dan proses fitur.
 class _EmptyState extends StatelessWidget {
   const _EmptyState();
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -300,12 +339,18 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
+/// Menyimpan state yang dibutuhkan fitur terkait.
+///
+/// Data ini dipakai untuk menentukan tampilan dan proses fitur.
 class _ErrorState extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
 
   const _ErrorState({required this.message, required this.onRetry});
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     return Column(

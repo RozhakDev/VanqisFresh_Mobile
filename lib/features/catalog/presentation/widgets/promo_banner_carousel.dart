@@ -9,9 +9,18 @@ import '../providers/catalog_provider.dart';
 import 'promo_products_sheet.dart';
 import '../../domain/models/promo.dart';
 
+/// Menampilkan komponen UI untuk kebutuhan halaman terkait.
+///
+/// Komponen ini membantu menyusun tampilan agar konsisten dan mudah digunakan.
 class PromoBannerCarousel extends ConsumerWidget {
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat PromoBannerCarousel perlu dibuat dengan nilai awal.
   const PromoBannerCarousel({super.key});
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final promosAsync = ref.watch(promosProvider);
@@ -37,15 +46,24 @@ class PromoBannerCarousel extends ConsumerWidget {
   }
 }
 
+/// Menampilkan komponen UI untuk kebutuhan halaman terkait.
+///
+/// Komponen ini membantu menyusun tampilan agar konsisten dan mudah digunakan.
 class _PromoCarouselWidget extends StatefulWidget {
   final List<Promo> promos;
 
   const _PromoCarouselWidget({required this.promos});
 
+  /// Membuat state yang mengelola perilaku widget.
+  ///
+  /// State ini menyimpan interaksi dan perubahan lokal widget.
   @override
   State<_PromoCarouselWidget> createState() => _PromoCarouselWidgetState();
 }
 
+/// Menyimpan state yang dibutuhkan fitur terkait.
+///
+/// Data ini dipakai untuk menentukan tampilan dan proses fitur.
 class _PromoCarouselWidgetState extends State<_PromoCarouselWidget> {
   late PageController _pageController;
   int _currentPage = 0;
@@ -57,6 +75,9 @@ class _PromoCarouselWidgetState extends State<_PromoCarouselWidget> {
     [Color(0xFFF97316), Color(0xFFFB923C)], // Orange
   ];
 
+  /// Menyiapkan state awal saat widget dibuat.
+  ///
+  /// Digunakan untuk inisialisasi sebelum tampilan pertama dirender.
   @override
   void initState() {
     super.initState();
@@ -64,6 +85,9 @@ class _PromoCarouselWidgetState extends State<_PromoCarouselWidget> {
     _startAutoScroll();
   }
 
+  /// Membersihkan resource saat widget tidak lagi digunakan.
+  ///
+  /// Dipanggil untuk melepas controller, listener, atau timer.
   @override
   void dispose() {
     _autoScrollTimer?.cancel();
@@ -71,6 +95,9 @@ class _PromoCarouselWidgetState extends State<_PromoCarouselWidget> {
     super.dispose();
   }
 
+  /// Memulai perpindahan banner promo secara otomatis.
+  ///
+  /// Digunakan agar promo berganti tanpa interaksi pengguna.
   void _startAutoScroll() {
     _autoScrollTimer = Timer.periodic(const Duration(seconds: 4), (_) {
       if (mounted && widget.promos.length > 1) {
@@ -84,10 +111,16 @@ class _PromoCarouselWidgetState extends State<_PromoCarouselWidget> {
     });
   }
 
+  /// Memilih gradasi warna berdasarkan posisi banner.
+  ///
+  /// Warna membantu setiap promo terlihat berbeda.
   List<Color> _getGradient(int index) {
     return _gradients[index % _gradients.length];
   }
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -129,12 +162,18 @@ class _PromoCarouselWidgetState extends State<_PromoCarouselWidget> {
   }
 }
 
+/// Menampilkan komponen UI untuk kebutuhan halaman terkait.
+///
+/// Komponen ini membantu menyusun tampilan agar konsisten dan mudah digunakan.
 class _PromoBannerCard extends StatelessWidget {
   final Promo promo;
   final List<Color> gradient;
 
   const _PromoBannerCard({required this.promo, required this.gradient});
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -280,12 +319,18 @@ class _PromoBannerCard extends StatelessWidget {
   }
 }
 
+/// Menampilkan komponen UI untuk kebutuhan halaman terkait.
+///
+/// Komponen ini membantu menyusun tampilan agar konsisten dan mudah digunakan.
 class _DotIndicator extends StatelessWidget {
   final bool isActive;
   final Color color;
 
   const _DotIndicator({required this.isActive, required this.color});
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
@@ -301,9 +346,15 @@ class _DotIndicator extends StatelessWidget {
   }
 }
 
+/// Menampilkan komponen UI untuk kebutuhan halaman terkait.
+///
+/// Komponen ini membantu menyusun tampilan agar konsisten dan mudah digunakan.
 class _PromoSkeletonLoader extends StatelessWidget {
   const _PromoSkeletonLoader();
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     return Container(

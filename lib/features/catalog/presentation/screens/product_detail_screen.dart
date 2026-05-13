@@ -13,21 +13,36 @@ import '../providers/catalog_provider.dart';
 import '../widgets/product_image_placeholder.dart';
 import '../../../orders/presentation/providers/cart_provider.dart';
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class ProductDetailScreen extends ConsumerStatefulWidget {
   final int productId;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat ProductDetailScreen perlu dibuat dengan nilai awal.
   const ProductDetailScreen({super.key, required this.productId});
 
+  /// Membuat state yang mengelola perilaku widget.
+  ///
+  /// State ini menyimpan interaksi dan perubahan lokal widget.
   @override
   ConsumerState<ProductDetailScreen> createState() => _ProductDetailScreenState();
 }
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
     with SingleTickerProviderStateMixin {
   int _quantity = 1;
   late AnimationController _fabAnimController;
   late Animation<double> _fabScale;
 
+  /// Menyiapkan state awal saat widget dibuat.
+  ///
+  /// Digunakan untuk inisialisasi sebelum tampilan pertama dirender.
   @override
   void initState() {
     super.initState();
@@ -40,12 +55,18 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
     );
   }
 
+  /// Membersihkan resource saat widget tidak lagi digunakan.
+  ///
+  /// Dipanggil untuk melepas controller, listener, atau timer.
   @override
   void dispose() {
     _fabAnimController.dispose();
     super.dispose();
   }
 
+  /// Menambahkan produk ke keranjang sesuai jumlah yang dipilih.
+  ///
+  /// Dipakai dari halaman detail produk.
   void _onAddToCart(Product product) async {
     if (!product.isAvailable || product.stock <= 0) return;
 
@@ -73,6 +94,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
     }
   }
 
+  /// Menambah jumlah produk hingga batas stok tersedia.
+  ///
+  /// Digunakan saat pengguna menaikkan kuantitas pembelian.
   void _incrementQty(int maxStock) {
     if (_quantity < maxStock) {
       setState(() => _quantity++);
@@ -80,6 +104,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
     }
   }
 
+  /// Mengurangi jumlah produk tanpa melewati batas minimum.
+  ///
+  /// Digunakan saat pengguna menurunkan kuantitas pembelian.
   void _decrementQty() {
     if (_quantity > 1) {
       setState(() => _quantity--);
@@ -87,6 +114,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
     }
   }
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     final productAsync = ref.watch(productDetailProvider(widget.productId));
@@ -102,6 +132,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
     );
   }
 
+  /// Menyusun konten utama berdasarkan data yang tersedia.
+  ///
+  /// Tampilan disesuaikan dengan state dan data produk.
   Widget _buildContent(BuildContext context, Product product) {
     final isAvailable = product.isAvailable && product.stock > 0;
     final totalPrice = product.price * _quantity;
@@ -383,6 +416,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
     );
   }
 
+  /// Menampilkan placeholder saat gambar produk belum tersedia.
+  ///
+  /// Dipakai agar layout tetap stabil.
   Widget _buildPlaceholder() {
     return Container(
       color: AppColors.border,
@@ -390,6 +426,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
     );
   }
 
+  /// Menampilkan tombol untuk mengubah jumlah produk.
+  ///
+  /// Tombol ini dipakai pada kontrol kuantitas.
   Widget _buildQtyBtn(IconData icon, bool enabled, VoidCallback onTap) {
     return InkWell(
       onTap: enabled ? onTap : null,
@@ -407,6 +446,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
     );
   }
 
+  /// Menampilkan pesan error dan aksi untuk mencoba ulang.
+  ///
+  /// Digunakan saat data gagal dimuat.
   Widget _buildError(String msg, WidgetRef ref) {
     return Center(
       child: Column(

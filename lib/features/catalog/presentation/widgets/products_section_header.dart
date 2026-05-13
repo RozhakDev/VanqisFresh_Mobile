@@ -3,16 +3,25 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
 
+/// Menampilkan komponen UI untuk kebutuhan halaman terkait.
+///
+/// Komponen ini membantu menyusun tampilan agar konsisten dan mudah digunakan.
 class ProductsSectionHeader extends StatelessWidget {
   final VoidCallback? onViewAll;
   final int totalCount;
 
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat ProductsSectionHeader perlu dibuat dengan nilai awal.
   const ProductsSectionHeader({
     super.key,
     this.onViewAll,
     required this.totalCount,
   });
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     return Padding(

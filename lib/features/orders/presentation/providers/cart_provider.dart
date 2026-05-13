@@ -6,12 +6,21 @@ final cartProvider = NotifierProvider<CartNotifier, List<CartItem>>(() {
   return CartNotifier();
 });
 
+/// Mengelola state dan aksi untuk fitur terkait.
+///
+/// Notifier ini memperbarui state berdasarkan interaksi atau hasil request.
 class CartNotifier extends Notifier<List<CartItem>> {
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   List<CartItem> build() {
     return [];
   }
 
+  /// Menambahkan produk ke keranjang atau memperbarui jumlahnya.
+  ///
+  /// Dipakai saat pengguna memilih produk untuk dibeli.
   void addItem(Product product, int quantity) {
     final stateList = state.toList();
     final index = stateList.indexWhere((item) => item.product.id == product.id);
@@ -26,6 +35,9 @@ class CartNotifier extends Notifier<List<CartItem>> {
     state = stateList;
   }
 
+  /// Memperbarui jumlah produk di keranjang.
+  ///
+  /// Perubahan ini menjaga total belanja tetap sesuai pilihan pengguna.
   void updateQuantity(int productId, int quantity) {
     if (quantity < 1) {
       removeItem(productId);
@@ -39,10 +51,16 @@ class CartNotifier extends Notifier<List<CartItem>> {
     }).toList();
   }
 
+  /// Menghapus produk dari keranjang.
+  ///
+  /// Digunakan saat pengguna tidak ingin membeli item tersebut.
   void removeItem(int productId) {
     state = state.where((item) => item.product.id != productId).toList();
   }
 
+  /// Mengosongkan seluruh item dari keranjang.
+  ///
+  /// Digunakan setelah checkout selesai atau keranjang direset.
   void clearCart() {
     state = [];
   }

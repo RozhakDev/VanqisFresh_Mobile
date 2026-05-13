@@ -13,23 +13,41 @@ import '../../../catalog/presentation/widgets/product_image_placeholder.dart';
 import '../../data/repositories/order_repository.dart';
 import '../providers/cart_provider.dart';
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class CheckoutScreen extends ConsumerStatefulWidget {
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat CheckoutScreen perlu dibuat dengan nilai awal.
   const CheckoutScreen({super.key});
 
+  /// Membuat state yang mengelola perilaku widget.
+  ///
+  /// State ini menyimpan interaksi dan perubahan lokal widget.
   @override
   ConsumerState<CheckoutScreen> createState() => _CheckoutScreenState();
 }
 
+/// Menampilkan halaman untuk alur pengguna terkait.
+///
+/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
 class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   final TextEditingController _noteController = TextEditingController();
   bool _isLoading = false;
 
+  /// Membersihkan resource saat widget tidak lagi digunakan.
+  ///
+  /// Dipanggil untuk melepas controller, listener, atau timer.
   @override
   void dispose() {
     _noteController.dispose();
     super.dispose();
   }
 
+  /// Memproses checkout melalui API dan membuka halaman pembayaran.
+  ///
+  /// Dipakai untuk alur checkout langsung dari aplikasi.
   Future<void> _processApiCheckout() async {
     final cartItems = ref.read(cartProvider);
     if (cartItems.isEmpty) return;
@@ -64,6 +82,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     }
   }
 
+  /// Memproses checkout melalui WhatsApp dengan ringkasan pesanan.
+  ///
+  /// Pesan dibuat dari isi keranjang dan catatan pengguna.
   Future<void> _processWaCheckout() async {
     final cartItems = ref.read(cartProvider);
     if (cartItems.isEmpty) return;
@@ -112,6 +133,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     }
   }
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context) {
     final cartItems = ref.watch(cartProvider);

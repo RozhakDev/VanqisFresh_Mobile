@@ -2,11 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 
+/// Menyediakan tipe snackbar yang didukung aplikasi.
+///
+/// Tipe ini menentukan warna dan ikon pesan.
 enum SnackbarType { success, error, info, warning }
 
+/// Menampilkan snackbar dengan gaya yang konsisten.
+///
+/// Utilitas ini dipakai untuk pesan sukses, error, info, dan peringatan.
 class SnackbarUtils {
   static OverlayEntry? _currentEntry;
 
+  /// Menampilkan komponen sesuai konteks yang diberikan.
+  ///
+  /// Dipakai saat UI perlu dibuka dari lokasi lain.
   static void show(
     BuildContext context,
     String message, {

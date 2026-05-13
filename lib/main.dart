@@ -6,6 +6,9 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
 
+/// Menjalankan inisialisasi awal dan memulai aplikasi.
+///
+/// Dipanggil saat aplikasi pertama kali dijalankan.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -19,9 +22,18 @@ void main() async {
   );
 }
 
+/// Menjalankan aplikasi dengan konfigurasi router dan tema utama.
+///
+/// Widget ini menjadi root dari seluruh tampilan aplikasi.
 class VanqisFreshApp extends ConsumerWidget {
+  /// Membuat instance dengan data yang dibutuhkan.
+  ///
+  /// Digunakan saat VanqisFreshApp perlu dibuat dengan nilai awal.
   const VanqisFreshApp({super.key});
 
+  /// Membangun tampilan berdasarkan context dan state saat ini.
+  ///
+  /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
