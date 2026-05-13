@@ -221,27 +221,10 @@ class _PromoBannerCard extends StatelessWidget {
               ),
             ),
 
-            if (promo.products.isNotEmpty && promo.products.first.image.isNotEmpty)
-              Positioned(
-                right: 16,
-                bottom: 0,
-                top: 0,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: CachedNetworkImage(
-                    imageUrl: promo.products.first.image,
-                    width: 110,
-                    fit: BoxFit.contain,
-                    placeholder: (_, __) => const SizedBox(width: 110),
-                    errorWidget: (_, __, ___) => const SizedBox(width: 110),
-                  ),
-                ),
-              ),
-
             Positioned(
               left: 20,
               top: 20,
-              right: 130,
+              right: 20,
               bottom: 16,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
