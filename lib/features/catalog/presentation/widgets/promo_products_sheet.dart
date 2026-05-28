@@ -60,7 +60,7 @@ class PromoProductsSheet extends ConsumerWidget {
         return Container(
           decoration: const BoxDecoration(
             color: AppColors.background,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
           ),
           clipBehavior: Clip.antiAlias,
           child: Column(
@@ -189,12 +189,18 @@ class PromoProductsSheet extends ConsumerWidget {
                               ),
                             );
                           },
-                    icon: const Icon(Icons.shopping_cart_checkout_rounded, size: 19),
-                    label: const Text('Tambah Semua ke Keranjang'),
+                    icon: const Icon(Icons.shopping_cart_checkout_rounded, size: 18),
+                    label: Text(
+                      'Tambah Semua ke Keranjang',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      fixedSize: const Size.fromHeight(46),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                   ),
@@ -320,12 +326,12 @@ class _PromoProductTile extends ConsumerWidget {
                 type: SnackbarType.success,
               );
             },
-            icon: const Icon(Icons.add_rounded, size: 20),
+            icon: const Icon(Icons.add_rounded, size: 18),
             style: IconButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: AppColors.textOnPrimary,
-              fixedSize: const Size(42, 42),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              fixedSize: const Size(36, 36),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
         ],

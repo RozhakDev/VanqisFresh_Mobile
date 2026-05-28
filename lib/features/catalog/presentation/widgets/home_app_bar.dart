@@ -85,7 +85,7 @@ class HomeAppBar extends StatelessWidget {
                 onTap: () {
                   SnackbarUtils.show(
                     context, 
-                    'Belum ada notifikasi baru', 
+                    'Belum ada kabar baru!', 
                     type: SnackbarType.info, 
                     duration: const Duration(seconds: 2),
                   );

@@ -12,6 +12,7 @@ import '../../features/orders/presentation/screens/checkout_screen.dart';
 import '../../features/orders/presentation/screens/payment_screen.dart';
 import '../../features/orders/presentation/screens/order_list_screen.dart';
 import '../../features/orders/presentation/screens/order_detail_screen.dart';
+import '../../features/orders/presentation/screens/payment_success_screen.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 
 /// Mengelola refresh router saat state autentikasi berubah.
@@ -87,6 +88,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final publicId = state.pathParameters['publicId']!;
           return PaymentScreen(publicId: publicId);
+        },
+      ),
+      GoRoute(
+        path: '/payment-success/:publicId',
+        name: 'payment_success',
+        builder: (context, state) {
+          final publicId = state.pathParameters['publicId']!;
+          return PaymentSuccessScreen(publicId: publicId);
         },
       ),
       GoRoute(

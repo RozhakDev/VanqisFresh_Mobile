@@ -14,20 +14,19 @@ final paymentMethodsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) 
   return ref.watch(orderRepositoryProvider).getPaymentMethods();
 });
 
-/// Menampilkan halaman untuk alur pengguna terkait.
+/// Menampilkan layar pembayaran pesanan.
 ///
-/// Halaman ini mengatur tampilan dan interaksi utama fitur tersebut.
+/// Halaman ini menampilkan daftar metode pembayaran yang tersedia
+/// serta area untuk mengunggah bukti transfer pengguna.
 class PaymentScreen extends ConsumerStatefulWidget {
   final String publicId;
 
-  /// Membuat instance dengan data yang dibutuhkan.
+  /// Membuat instance halaman pembayaran.
   ///
-  /// Digunakan saat PaymentScreen perlu dibuat dengan nilai awal.
+  /// Membutuhkan ID pesanan publik untuk memproses unggahan bukti.
   const PaymentScreen({super.key, required this.publicId});
 
-  /// Membuat state yang mengelola perilaku widget.
-  ///
-  /// State ini menyimpan interaksi dan perubahan lokal widget.
+  /// Menginisialisasi state yang mengatur interaksi pengguna.
   @override
   ConsumerState<PaymentScreen> createState() => _PaymentScreenState();
 }
@@ -40,9 +39,9 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   bool _isUploading = false;
   final ImagePicker _picker = ImagePicker();
 
-  /// Membuka pemilih gambar untuk bukti pembayaran.
+  /// Membuka galeri perangkat untuk memilih gambar bukti transfer.
   ///
-  /// File yang dipilih akan dipakai saat upload bukti.
+  /// Gambar yang dipilih akan disimpan di state lokal sebelum diunggah.
   Future<void> _pickImage() async {
     try {
       final pickedFile = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
@@ -61,9 +60,10 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     }
   }
 
-  /// Mengunggah bukti pembayaran ke server.
+  /// Mengirim gambar bukti transfer ke server.
   ///
-  /// Dipakai setelah pengguna memilih gambar bukti.
+  /// Fungsi ini juga menangani proses pemuatan (*loading*) 
+  /// serta navigasi otomatis ke halaman sukses jika unggahan berhasil.
   Future<void> _uploadProof() async {
     if (_selectedImage == null) return;
 
@@ -73,13 +73,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
       await ref.read(orderRepositoryProvider).uploadPaymentProof(widget.publicId, _selectedImage!.path);
       
       if (!mounted) return;
-      SnackbarUtils.show(
-        context,
-        'Bukti pembayaran berhasil diunggah. Menunggu verifikasi admin.',
-        type: SnackbarType.success,
-      );
-      
-      context.go('/');
+      context.go('/payment-success/${widget.publicId}');
     } catch (e) {
       if (!mounted) return;
       SnackbarUtils.show(context, e.toString().replaceAll('Exception: ', ''), type: SnackbarType.error);
@@ -88,49 +82,51 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     }
   }
 
-  /// Menampilkan gambar dalam dialog yang bisa diperbesar.
+  /// Menampilkan dialog berisi gambar yang bisa diperbesar (*zoomable*).
   ///
-  /// Digunakan agar bukti pembayaran mudah diperiksa.
+  /// Fitur ini sangat membantu pengguna saat perlu memindai kode QRIS
+  /// secara detail dari layar perangkat mereka.
   void _showZoomableImage(BuildContext context, String imageUrl) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.all(16),
-        child: Stack(
-          alignment: Alignment.center,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            InteractiveViewer(
-              panEnabled: true,
-              boundaryMargin: const EdgeInsets.all(20),
-              minScale: 0.5,
-              maxScale: 4,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl,
-                  fit: BoxFit.contain,
-                  placeholder: (context, url) => Container(
-                    color: Colors.white,
-                    width: 300,
-                    height: 300,
-                    child: const Center(child: CircularProgressIndicator(color: AppColors.primary)),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    color: Colors.white,
-                    width: 300,
-                    height: 300,
-                    child: const Center(child: Icon(Icons.broken_image_rounded, size: 50, color: AppColors.textHint)),
-                  ),
-                ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: IconButton(
+                icon: const Icon(Icons.cancel_rounded, color: Colors.white, size: 36),
+                onPressed: () => Navigator.of(context).pop(),
               ),
             ),
-            Positioned(
-              top: 0,
-              right: 0,
-              child: IconButton(
-                icon: const Icon(Icons.close_rounded, color: Colors.white, size: 30, shadows: [Shadow(color: Colors.black54, blurRadius: 4)]),
-                onPressed: () => Navigator.of(context).pop(),
+            const SizedBox(height: 8),
+            Flexible(
+              child: InteractiveViewer(
+                panEnabled: true,
+                minScale: 0.5,
+                maxScale: 4,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: CachedNetworkImage(
+                    imageUrl: imageUrl,
+                    fit: BoxFit.contain,
+                    placeholder: (context, url) => Container(
+                      color: Colors.white,
+                      width: 300,
+                      height: 300,
+                      child: const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      color: Colors.white,
+                      width: 300,
+                      height: 300,
+                      child: const Center(child: Icon(Icons.broken_image_rounded, size: 50, color: AppColors.textHint)),
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
@@ -139,7 +135,34 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     );
   }
 
-  /// Membangun tampilan berdasarkan context dan state saat ini.
+  /// Menentukan warna identitas berdasarkan nama metode pembayaran.
+  ///
+  /// Berguna untuk menampilkan logo bank atau *e-wallet* secara intuitif.
+  Color _getPaymentColor(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains('bca')) return const Color(0xFF0066AE);
+    if (lower.contains('bri')) return const Color(0xFF00529C);
+    if (lower.contains('mandiri')) return const Color(0xFFF2A123);
+    if (lower.contains('bni')) return const Color(0xFF005E6A);
+    if (lower.contains('gopay') || lower.contains('go-pay')) return const Color(0xFF00AED6);
+    if (lower.contains('ovo')) return const Color(0xFF4C3494);
+    if (lower.contains('dana')) return const Color(0xFF118EEA);
+    if (lower.contains('shopeepay')) return const Color(0xFFEE4D2D);
+    if (lower.contains('qris')) return const Color(0xFFED1C24);
+    return AppColors.primary;
+  }
+
+  /// Mengembalikan ikon yang sesuai dengan jenis metode pembayaran.
+  ///
+  /// Menyesuaikan ikon otomatis antara QRIS, transfer bank, atau dompet digital.
+  IconData _getPaymentIcon(String name) {
+    final lower = name.toLowerCase();
+    if (lower.contains('qris')) return Icons.qr_code_2_rounded;
+    if (lower.contains('bank') || lower.contains('bca') || lower.contains('bri') || lower.contains('mandiri') || lower.contains('bni')) return Icons.account_balance_rounded;
+    return Icons.account_balance_wallet_rounded;
+  }
+
+  /// Membangun antarmuka keseluruhan untuk layar pembayaran.
   ///
   /// Digunakan oleh Flutter untuk merender UI terbaru.
   @override
@@ -154,33 +177,32 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
         scrolledUnderElevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
-          onPressed: () => context.pop(),
+          onPressed: () => context.go('/'),
         ),
         title: Text(
           'Pembayaran',
           style: GoogleFonts.inter(
             color: AppColors.textPrimary,
-            fontWeight: FontWeight.w800,
-            fontSize: 22,
-            letterSpacing: -0.5,
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
           ),
         ),
-        centerTitle: false,
+        centerTitle: true,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 20),
             child: Container(
-              width: 40,
-              height: 40,
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.border),
               ),
               child: const Icon(
                 Icons.support_agent_rounded,
                 color: AppColors.textPrimary,
-                size: 22,
+                size: 18,
               ),
             ),
           ),
@@ -192,14 +214,57 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 8),
-              Text('Pesanan Berhasil Dibuat!', style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.primaryDark), textAlign: TextAlign.center),
-              const SizedBox(height: 8),
-              Text('ID: ${widget.publicId}', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary), textAlign: TextAlign.center),
+              // Clean Success Banner
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 36),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Pesanan Berhasil Dibuat!',
+                      style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.primaryDark),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.receipt_long_rounded, color: AppColors.textSecondary, size: 16),
+                          const SizedBox(width: 8),
+                          Text(
+                            'ID: ${widget.publicId.split('-').first.toUpperCase()}',
+                            style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textPrimary, letterSpacing: 0.5),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 32),
 
-              Text('Pilih Metode Pembayaran', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
-              const SizedBox(height: 16),
+              Text('Metode Pembayaran', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+              const SizedBox(height: 12),
               
               paymentsAsync.when(
                 data: (methods) => methods.isEmpty 
@@ -210,101 +275,103 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: AppColors.border),
                       ),
-                      child: const Center(child: Text('Belum ada metode pembayaran yang dikonfigurasi admin.', textAlign: TextAlign.center)),
+                      child: const Center(child: Text('Belum ada metode pembayaran.', textAlign: TextAlign.center)),
                     )
                   : Column(
                       children: methods.map((m) {
                         final hasQr = m['qr_code'] != null && m['qr_code'].toString().isNotEmpty;
+                        final String payName = m['name'] ?? 'Bank';
+                        final Color pColor = _getPaymentColor(payName);
                         
                         return Container(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          padding: const EdgeInsets.all(16),
+                          margin: const EdgeInsets.only(bottom: 12),
                           decoration: BoxDecoration(
-                            color: AppColors.surface,
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: AppColors.border),
+                            boxShadow: [
+                              BoxShadow(color: AppColors.textPrimary.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4)),
+                            ],
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 48,
-                                    height: 48,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primaryMuted.withOpacity(0.4), 
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: const Icon(Icons.account_balance_wallet_rounded, color: AppColors.primary),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(m['name'] ?? 'Bank', style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.textPrimary)),
-                                        const SizedBox(height: 4),
-                                        Text('${m['account_number'] ?? ''} a.n ${m['account_name'] ?? ''}', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                          child: Theme(
+                            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                            child: ExpansionTile(
+                              tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                              leading: Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  color: pColor.withOpacity(0.1), 
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(_getPaymentIcon(payName), color: pColor, size: 24),
                               ),
-                              if (hasQr) ...[
-                                const SizedBox(height: 16),
-                                const Divider(color: AppColors.border),
-                                const SizedBox(height: 16),
-                                Center(
+                              title: Text(payName, style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 15, color: AppColors.textPrimary)),
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 4.0),
+                                child: Text('${m['account_number'] ?? ''}', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
+                              ),
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.background,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
                                   child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
-                                      Text('Scan QRIS di bawah ini:', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
-                                      const SizedBox(height: 12),
-                                      GestureDetector(
-                                        onTap: () => _showZoomableImage(context, m['qr_code']),
-                                        child: Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            Container(
+                                      Text('Atas Nama', style: GoogleFonts.inter(fontSize: 12, color: AppColors.textHint)),
+                                      const SizedBox(height: 2),
+                                      Text('${m['account_name'] ?? '-'}', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+                                      
+                                      if (hasQr) ...[
+                                        const SizedBox(height: 16),
+                                        const Divider(color: AppColors.border),
+                                        const SizedBox(height: 16),
+                                        Text('Scan QRIS di bawah ini:', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textSecondary)),
+                                        const SizedBox(height: 12),
+                                        Center(
+                                          child: GestureDetector(
+                                            onTap: () => _showZoomableImage(context, m['qr_code']),
+                                            child: Container(
                                               decoration: BoxDecoration(
                                                 borderRadius: BorderRadius.circular(16),
                                                 border: Border.all(color: AppColors.border),
                                                 color: Colors.white,
+                                                boxShadow: [
+                                                  BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                                                ],
                                               ),
-                                              child: ClipRRect(
-                                                borderRadius: BorderRadius.circular(16),
-                                                child: CachedNetworkImage(
-                                                  imageUrl: m['qr_code'],
-                                                  width: 220,
-                                                  height: 220,
-                                                  fit: BoxFit.cover,
-                                                  placeholder: (context, url) => const SizedBox(
-                                                    width: 220, height: 220,
-                                                    child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary)),
+                                              child: Stack(
+                                                alignment: Alignment.center,
+                                                children: [
+                                                  ClipRRect(
+                                                    borderRadius: BorderRadius.circular(16),
+                                                    child: CachedNetworkImage(
+                                                      imageUrl: m['qr_code'],
+                                                      width: 180,
+                                                      height: 180,
+                                                      fit: BoxFit.cover,
+                                                    ),
                                                   ),
-                                                  errorWidget: (context, url, error) => const SizedBox(
-                                                    width: 220, height: 220,
-                                                    child: Center(child: Icon(Icons.broken_image_rounded, size: 50, color: AppColors.textHint)),
+                                                  Container(
+                                                    padding: const EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(color: Colors.black.withOpacity(0.6), shape: BoxShape.circle),
+                                                    child: const Icon(Icons.zoom_in_rounded, color: Colors.white, size: 20),
                                                   ),
-                                                ),
+                                                ],
                                               ),
                                             ),
-                                            Container(
-                                              padding: const EdgeInsets.all(8),
-                                              decoration: BoxDecoration(
-                                                color: Colors.black.withOpacity(0.5),
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: const Icon(Icons.zoom_in_rounded, color: Colors.white, size: 24),
-                                            ),
-                                          ],
+                                          ),
                                         ),
-                                      ),
+                                      ],
                                     ],
                                   ),
                                 ),
                               ],
-                            ],
+                            ),
                           ),
                         );
                       }).toList(),
@@ -312,11 +379,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                 loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
                 error: (e, _) => Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.error),
-                  ),
+                  decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.error)),
                   child: Text('Gagal memuat metode pembayaran: $e', style: GoogleFonts.inter(color: AppColors.error)),
                 ),
               ),
@@ -330,9 +393,9 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                 child: Container(
                   height: 160,
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
+                    color: _selectedImage != null ? AppColors.surface : AppColors.primary.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.primary.withOpacity(0.5), width: 1.5, style: BorderStyle.solid),
+                    border: Border.all(color: AppColors.primary.withOpacity(0.4), width: 1.5),
                   ),
                   child: _selectedImage != null
                     ? Stack(
@@ -349,11 +412,8 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                               onTap: () => setState(() => _selectedImage = null),
                               child: Container(
                                 padding: const EdgeInsets.all(6),
-                                decoration: const BoxDecoration(
-                                  color: Colors.black54,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(Icons.close_rounded, color: Colors.white, size: 18),
+                                decoration: BoxDecoration(color: Colors.black.withOpacity(0.6), shape: BoxShape.circle),
+                                child: const Icon(Icons.close_rounded, color: Colors.white, size: 16),
                               ),
                             ),
                           )
@@ -364,16 +424,13 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                         children: [
                           Container(
                             padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryMuted.withOpacity(0.3),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.cloud_upload_rounded, size: 32, color: AppColors.primary),
+                            decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.15), shape: BoxShape.circle),
+                            child: const Icon(Icons.add_photo_alternate_rounded, size: 32, color: AppColors.primary),
                           ),
                           const SizedBox(height: 12),
-                          Text('Ketuk untuk memilih foto', style: GoogleFonts.inter(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w600)),
+                          Text('Ketuk untuk memilih foto', style: GoogleFonts.inter(color: AppColors.primary, fontSize: 14, fontWeight: FontWeight.w600)),
                           const SizedBox(height: 4),
-                          Text('Format yang didukung: JPG/PNG', style: GoogleFonts.inter(color: AppColors.textSecondary, fontSize: 12)),
+                          Text('JPG atau PNG (Maks. 5MB)', style: GoogleFonts.inter(color: AppColors.textSecondary, fontSize: 12)),
                         ],
                       ),
                 ),
@@ -383,24 +440,25 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
               ElevatedButton(
                 onPressed: _selectedImage == null || _isUploading ? null : _uploadProof,
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  fixedSize: const Size.fromHeight(46),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   backgroundColor: AppColors.primary,
                   disabledBackgroundColor: AppColors.border,
+                  elevation: 0,
                 ),
                 child: _isUploading
                     ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : Text('Konfirmasi Pembayaran', style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 15, color: Colors.white)),
+                    : Text('Konfirmasi Pembayaran', style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14, color: Colors.white)),
               ),
               
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               TextButton(
                 onPressed: () => context.go('/'),
                 style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  fixedSize: const Size.fromHeight(46),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: Text('Bayar Nanti (Lewati)', style: GoogleFonts.inter(color: AppColors.textSecondary, fontWeight: FontWeight.w600, fontSize: 15)),
+                child: Text('Bayar Nanti (Lewati)', style: GoogleFonts.inter(color: AppColors.textSecondary, fontWeight: FontWeight.w600, fontSize: 14)),
               ),
               const SizedBox(height: 24),
             ],

@@ -267,7 +267,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ElevatedButton(
                   onPressed: authState.isLoading ? null : _onRegister,
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.textOnPrimary,
                     elevation: 0,
@@ -284,13 +283,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             strokeWidth: 2,
                           ),
                         )
-                      : Text(
-                          'Daftar Sekarang',
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                      : const Text('Daftar Sekarang'),
                 ),
                 const SizedBox(height: 24),
 

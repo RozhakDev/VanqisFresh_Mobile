@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/models/auth_state.dart';
-import '../../domain/models/user.dart';
 import '../../data/repositories/auth_repository.dart';
 
 final authProvider = NotifierProvider<AuthNotifier, AuthState>(() {

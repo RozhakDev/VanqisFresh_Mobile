@@ -7,7 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/snackbar_utils.dart';
-import '../providers/auth_provider.dart';
 import '../../data/repositories/auth_repository.dart';
 
 /// Menampilkan halaman untuk alur pengguna terkait.
@@ -219,7 +218,6 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
               ElevatedButton(
                 onPressed: _isLoading || _otpController.text.length < 6 ? null : _verifyOtp,
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
                   backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.textOnPrimary,
                   elevation: 0,
@@ -233,13 +231,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                         width: 20, 
                         child: CircularProgressIndicator(color: AppColors.textOnPrimary, strokeWidth: 2)
                       )
-                    : Text(
-                        'Verifikasi Sekarang',
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                    : const Text('Verifikasi Sekarang'),
               ),
               const SizedBox(height: 24),
 

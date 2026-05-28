@@ -79,13 +79,12 @@ class SnackbarUtils {
                   constraints: const BoxConstraints(minHeight: 52),
                   padding: const EdgeInsets.fromLTRB(12, 10, 14, 10),
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
+                    color: const Color(0xFF1F2937),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.border),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.textPrimary.withValues(alpha: 0.08),
-                        blurRadius: 18,
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 24,
                         offset: const Offset(0, 8),
                       ),
                     ],
@@ -97,7 +96,7 @@ class SnackbarUtils {
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                          color: accentColor.withValues(alpha: 0.10),
+                          color: accentColor.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(icon, color: accentColor, size: 18),
@@ -107,7 +106,7 @@ class SnackbarUtils {
                         child: Text(
                           message.replaceAll('\n', ' '),
                           style: GoogleFonts.inter(
-                            color: AppColors.textPrimary,
+                            color: Colors.white,
                             fontSize: 13.5,
                             fontWeight: FontWeight.w500,
                             height: 1.35,

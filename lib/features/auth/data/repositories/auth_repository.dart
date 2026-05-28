@@ -129,7 +129,7 @@ class AuthRepository {
     try {
       final response = await _dio.get('/users/profile/');
       return User.fromJson(response.data);
-    } on DioException catch (e) {
+    } on DioException {
       throw Exception('Profil belum bisa dimuat\nCoba lagi nanti');
     }
   }

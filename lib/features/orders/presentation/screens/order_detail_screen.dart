@@ -91,12 +91,11 @@ class OrderDetailScreen extends ConsumerWidget {
           'Detail Pesanan',
           style: GoogleFonts.inter(
             color: AppColors.textPrimary,
-            fontWeight: FontWeight.w800,
-            fontSize: 22,
-            letterSpacing: -0.5,
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
           ),
         ),
-        centerTitle: false,
+        centerTitle: true,
         actions: [
           detailAsync.when(
             data: (_) => IconButton(
@@ -319,7 +318,7 @@ class OrderDetailScreen extends ConsumerWidget {
                         width: double.infinity,
                         child: ElevatedButton.icon(
                           icon: const Icon(Icons.upload_file_rounded, size: 20),
-                          label: const Text('Upload Bukti Pembayaran'),
+                          label: const Text('Unggah Bukti'),
                           onPressed: () => context.push('/payment/$publicId'),
                           style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
                         ),

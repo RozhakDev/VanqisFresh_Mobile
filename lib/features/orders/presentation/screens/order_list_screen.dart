@@ -418,15 +418,14 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
         title: Text(
-          'Riwayat Pesanan',
+          'Pesanan Saya',
           style: GoogleFonts.inter(
             color: AppColors.textPrimary,
-            fontWeight: FontWeight.w800,
-            fontSize: 22,
-            letterSpacing: -0.5,
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
           ),
         ),
-        centerTitle: false,
+        centerTitle: true,
         actions: [
           if (orderState.isLoading && orderState.orders.isNotEmpty)
             const Padding(

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Menyediakan kumpulan warna utama aplikasi.
+
+/// Menyimpan daftar palet warna resmi yang digunakan di seluruh aplikasi.
 ///
-/// Warna ini menjaga tampilan tetap konsisten.
+/// Class ini memastikan agar penggunaan warna UI konsisten dan
+/// selaras dengan identitas merek perusahaan.
 class AppColors {
   static const Color primary = Color(0xFFEAB308);
   static const Color primaryDark = Color(0xFF134E4A);
@@ -38,6 +40,7 @@ class AppColors {
   static const Color warning = Color(0xFFFACC15);
   static const Color info    = Color(0xFF3B82F6);
 
+  /// Memberikan efek bayangan lembut untuk komponen berbentuk kartu.
   static List<BoxShadow> get cardShadow => [
     BoxShadow(
       color: const Color(0xFF134E4A).withValues(alpha: 0.04),
@@ -46,6 +49,7 @@ class AppColors {
     ),
   ];
 
+  /// Memberikan efek bayangan sangat halus untuk elemen UI sekunder.
   static List<BoxShadow> get softShadow => [
     BoxShadow(
       color: const Color(0xFF134E4A).withValues(alpha: 0.03),
@@ -54,6 +58,7 @@ class AppColors {
     ),
   ];
 
+  /// Memberikan efek bayangan mengambang khusus untuk bilah navigasi bawah.
   static List<BoxShadow> get bottomBarShadow => [
     BoxShadow(
       color: const Color(0xFF134E4A).withValues(alpha: 0.06),
@@ -62,6 +67,7 @@ class AppColors {
     ),
   ];
 
+  /// Memberikan efek pendaran berwarna utama pada tombol atau elemen aktif.
   static List<BoxShadow> get primaryGlow => [
     BoxShadow(
       color: primary.withValues(alpha: 0.25),
@@ -71,10 +77,16 @@ class AppColors {
   ];
 }
 
-/// Menyediakan konfigurasi tema utama aplikasi.
+
+/// Mengelola konfigurasi gaya dan tema global aplikasi secara terpusat.
 ///
-/// Tema ini digunakan oleh MaterialApp.
+/// Class ini menyatukan warna, tipografi, dan gaya komponen bawaan 
+/// Flutter agar seragam di semua halaman.
 class AppTheme {
+  /// Membangun konfigurasi tema terang (*Light Theme*) standar.
+  ///
+  /// Tema ini merombak warna dasar, gaya teks, hingga bentuk tombol
+  /// sesuai pedoman UI/UX aplikasi.
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
@@ -118,8 +130,8 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 15),
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          textStyle: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
+          fixedSize: const Size.fromHeight(48),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -129,8 +141,18 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 15),
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          textStyle: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
+          fixedSize: const Size.fromHeight(48),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.textSecondary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
+          fixedSize: const Size.fromHeight(48),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(

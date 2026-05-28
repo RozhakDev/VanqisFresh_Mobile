@@ -168,6 +168,35 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                     ),
                   ),
                 ),
+                actions: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20, top: 8, bottom: 8),
+                    child: GestureDetector(
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        SnackbarUtils.show(
+                          context,
+                          'Fitur favorit segera hadir!',
+                          type: SnackbarType.info,
+                        );
+                      },
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.9),
+                          shape: BoxShape.circle,
+                          boxShadow: AppColors.softShadow,
+                        ),
+                        child: const Icon(
+                          Icons.favorite_border_rounded,
+                          size: 20,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
                 flexibleSpace: FlexibleSpaceBar(
                   background: Stack(
                     fit: StackFit.expand,
@@ -343,10 +372,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
             children: [
               if (isAvailable) ...[
                 Container(
-                  height: 54,
+                  height: 46,
                   decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: AppColors.border),
                   ),
                   child: Row(
@@ -359,8 +388,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                           '$_quantity',
                           textAlign: TextAlign.center,
                           style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
                           ),
                         ),
@@ -369,7 +398,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                     ],
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 16),
               ],
               
               Expanded(
@@ -378,16 +407,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                   child: GestureDetector(
                     onTap: isAvailable ? () => _onAddToCart(product) : null,
                     child: Container(
-                      height: 54,
+                      height: 46,
                       decoration: BoxDecoration(
                         color: isAvailable ? AppColors.primary : AppColors.background,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(12),
                         border: !isAvailable ? Border.all(color: AppColors.border) : null,
                         boxShadow: isAvailable
                             ? [
                                 BoxShadow(
                                   color: AppColors.primary.withOpacity(0.3),
-                                  blurRadius: 10,
+                                  blurRadius: 8,
                                   offset: const Offset(0, 4),
                                 )
                               ]
@@ -400,8 +429,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
                               : 'Stok Terjual Habis',
                           style: GoogleFonts.inter(
                             color: isAvailable ? AppColors.textOnPrimary : AppColors.textHint,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
                           ),
                         ),
                       ),
@@ -432,14 +461,14 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen>
   Widget _buildQtyBtn(IconData icon, bool enabled, VoidCallback onTap) {
     return InkWell(
       onTap: enabled ? onTap : null,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        width: 44,
-        height: 54,
+        width: 36,
+        height: 46,
         alignment: Alignment.center,
         child: Icon(
           icon,
-          size: 20,
+          size: 18,
           color: enabled ? AppColors.textPrimary : AppColors.textHint,
         ),
       ),

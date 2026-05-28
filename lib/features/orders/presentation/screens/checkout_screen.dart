@@ -150,9 +150,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           children: [
             const Icon(Icons.shopping_cart_outlined, size: 80, color: AppColors.textHint),
             const SizedBox(height: 24),
-            Text('Masih Kosong', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+            Text('Masih Sepi Nih', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
             const SizedBox(height: 8),
-            Text('Yuk, mulai belanja sayur dan buah segar!', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
+            Text('Yuk isi dengan produk segar pilihanmu!', style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
             const SizedBox(height: 32),
             ElevatedButton(
               onPressed: () => context.go('/'),
@@ -278,53 +278,64 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text('${CurrencyFormat.convertToIdr(item.product.price)} / ${item.product.unit}', style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary)),
-                                        Row(
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () {
-                                                if (item.quantity == 1) {
-                                                  ref.read(cartProvider.notifier).removeItem(item.product.id);
-                                                } else {
-                                                  ref.read(cartProvider.notifier).updateQuantity(item.product.id, item.quantity - 1);
-                                                }
-                                              },
-                                              child: Container(
-                                                padding: const EdgeInsets.all(4),
-                                                decoration: BoxDecoration(
-                                                  color: item.quantity == 1 ? AppColors.error.withValues(alpha: 0.1) : Colors.transparent,
-                                                  border: Border.all(color: item.quantity == 1 ? Colors.transparent : AppColors.border),
-                                                  borderRadius: BorderRadius.circular(6)
+                                        Container(
+                                          height: 36,
+                                          decoration: BoxDecoration(
+                                            color: AppColors.background,
+                                            borderRadius: BorderRadius.circular(10),
+                                            border: Border.all(color: AppColors.border),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              InkWell(
+                                                onTap: () {
+                                                  if (item.quantity == 1) {
+                                                    ref.read(cartProvider.notifier).removeItem(item.product.id);
+                                                  } else {
+                                                    ref.read(cartProvider.notifier).updateQuantity(item.product.id, item.quantity - 1);
+                                                  }
+                                                },
+                                                borderRadius: BorderRadius.circular(10),
+                                                child: Container(
+                                                  width: 32,
+                                                  alignment: Alignment.center,
+                                                  child: Icon(
+                                                    item.quantity == 1 ? Icons.delete_outline_rounded : Icons.remove_rounded,
+                                                    size: 16,
+                                                    color: item.quantity == 1 ? AppColors.error : AppColors.textPrimary,
+                                                  ),
                                                 ),
-                                                child: Icon(item.quantity == 1 ? Icons.delete_outline_rounded : Icons.remove_rounded, size: 16, color: item.quantity == 1 ? AppColors.error : AppColors.textPrimary),
                                               ),
-                                            ),
-                                            SizedBox(
-                                              width: 32,
-                                              child: Text(
-                                                item.quantity.toString(),
-                                                textAlign: TextAlign.center,
-                                                style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textPrimary),
-                                              ),
-                                            ),
-                                            GestureDetector(
-                                              onTap: () {
-                                                if (item.quantity < item.product.stock) {
-                                                  ref.read(cartProvider.notifier).updateQuantity(item.product.id, item.quantity + 1);
-                                                } else {
-                                                  SnackbarUtils.show(context, 'Jumlah melebihi stok tersedia.', type: SnackbarType.warning);
-                                                }
-                                              },
-                                              child: Container(
-                                                padding: const EdgeInsets.all(4),
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(color: AppColors.border),
-                                                  borderRadius: BorderRadius.circular(6),
-                                                  color: item.quantity >= item.product.stock ? AppColors.background : Colors.transparent,
+                                              SizedBox(
+                                                width: 32,
+                                                child: Text(
+                                                  item.quantity.toString(),
+                                                  textAlign: TextAlign.center,
+                                                  style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 13, color: AppColors.textPrimary),
                                                 ),
-                                                child: Icon(Icons.add_rounded, size: 16, color: item.quantity >= item.product.stock ? AppColors.textHint : AppColors.textPrimary),
                                               ),
-                                            ),
-                                          ],
+                                              InkWell(
+                                                onTap: () {
+                                                  if (item.quantity < item.product.stock) {
+                                                    ref.read(cartProvider.notifier).updateQuantity(item.product.id, item.quantity + 1);
+                                                  } else {
+                                                    SnackbarUtils.show(context, 'Jumlah melebihi stok tersedia.', type: SnackbarType.warning);
+                                                  }
+                                                },
+                                                borderRadius: BorderRadius.circular(10),
+                                                child: Container(
+                                                  width: 32,
+                                                  alignment: Alignment.center,
+                                                  child: Icon(
+                                                    Icons.add_rounded,
+                                                    size: 16,
+                                                    color: item.quantity >= item.product.stock ? AppColors.textHint : AppColors.textPrimary,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -395,8 +406,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                           style: OutlinedButton.styleFrom(
                             foregroundColor: const Color(0xFF25D366),
                             side: const BorderSide(color: Color(0xFF25D366), width: 1.5),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            fixedSize: const Size.fromHeight(46),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                         ),
                       ),
@@ -407,10 +418,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                           onPressed: _processApiCheckout,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            fixedSize: const Size.fromHeight(46),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
-                          child: Text('Buat Pesanan', style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.textOnPrimary)),
+                          child: Text('Buat Pesanan', style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14, color: AppColors.textOnPrimary)),
                         ),
                       ),
                     ],
@@ -443,12 +454,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           'Keranjang Belanja',
           style: GoogleFonts.inter(
             color: AppColors.textPrimary,
-            fontWeight: FontWeight.w800,
-            fontSize: 22,
-            letterSpacing: -0.5,
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
           ),
         ),
-        centerTitle: false,
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.manage_accounts_outlined, color: AppColors.textPrimary),

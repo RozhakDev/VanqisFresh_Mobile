@@ -148,16 +148,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
+        leading: context.canPop() 
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
+                onPressed: () => context.pop(),
+              )
+            : null,
         title: Text(
           'Profil Saya',
           style: GoogleFonts.inter(
             color: AppColors.textPrimary,
-            fontWeight: FontWeight.w800,
-            fontSize: 22,
-            letterSpacing: -0.5,
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
           ),
         ),
-        centerTitle: false,
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout_rounded, color: AppColors.error),
@@ -254,6 +259,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           _buildLabel('Nama Depan'),
                           TextFormField(
                             controller: _firstNameCtrl,
+                            style: GoogleFonts.inter(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
                             decoration: _buildInputDecoration('Vanqis', Icons.person_outline_rounded),
                             validator: (value) => value == null || value.trim().isEmpty 
                                 ? 'Wajib diisi' : null,
@@ -269,6 +275,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           _buildLabel('Nama Belakang'),
                           TextFormField(
                             controller: _lastNameCtrl,
+                            style: GoogleFonts.inter(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
                             decoration: _buildInputDecoration('Fresh', Icons.person_outline_rounded),
                             validator: (value) => value == null || value.trim().isEmpty 
                                 ? 'Wajib diisi' : null,
@@ -284,6 +291,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 TextFormField(
                   controller: _phoneCtrl,
                   keyboardType: TextInputType.phone,
+                  style: GoogleFonts.inter(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
                   decoration: _buildInputDecoration('08xxxxxxxx', Icons.phone_android_rounded),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) return 'Nomor HP wajib diisi';
@@ -299,6 +307,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 TextFormField(
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
+                  style: GoogleFonts.inter(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
                   decoration: _buildInputDecoration('user@vanqisfresh.com', Icons.email_outlined),
                   validator: (value) {
                     if (value != null && value.trim().isNotEmpty) {
@@ -313,28 +322,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 TextFormField(
                   controller: _addressCtrl,
                   maxLines: 3,
-                  decoration: InputDecoration(
+                  style: GoogleFonts.inter(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
+                  decoration: const InputDecoration(
                     hintText: 'Contoh: Jl. Dipayuda No. 1, RT 01/RW 02, Banjarnegara',
-                    hintStyle: GoogleFonts.inter(color: AppColors.textHint, fontSize: 14),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: AppColors.border),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: AppColors.border),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: AppColors.error),
-                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) return 'Alamat wajib diisi';
@@ -344,34 +334,34 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
                 const SizedBox(height: 40),
 
-                ElevatedButton(
-                  onPressed: authState.isLoading ? null : _onUpdateProfile,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                  ElevatedButton(
+                    onPressed: authState.isLoading ? null : _onUpdateProfile,
+                    style: ElevatedButton.styleFrom(
+                      fixedSize: const Size.fromHeight(46),
+                      backgroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
                     ),
-                    elevation: 0,
+                    child: authState.isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            'Simpan Pembaruan',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
                   ),
-                  child: authState.isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : Text(
-                          'Simpan Pembaruan',
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
-                ),
                 const SizedBox(height: 32),
               ],
             ),
@@ -390,9 +380,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       child: Text(
         text,
         style: GoogleFonts.inter(
-          fontSize: 13,
+          fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: AppColors.textSecondary,
+          color: AppColors.textPrimary,
         ),
       ),
     );
@@ -404,27 +394,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   InputDecoration _buildInputDecoration(String hint, IconData icon) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: GoogleFonts.inter(color: AppColors.textHint, fontSize: 14),
-      prefixIcon: Icon(icon, color: AppColors.textHint, size: 20),
-      filled: true,
-      fillColor: Colors.white,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: AppColors.border),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: AppColors.border),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: AppColors.primary, width: 2),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: AppColors.error),
-      ),
+      prefixIcon: Icon(icon, color: AppColors.textHint, size: 22),
     );
   }
 }
