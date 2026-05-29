@@ -7,6 +7,8 @@ import '../../features/catalog/presentation/screens/product_detail_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/verify_email_screen.dart';
+import '../../features/auth/presentation/screens/forgot_password_screen.dart';
+import '../../features/auth/presentation/screens/reset_password_screen.dart';
 import '../../features/auth/presentation/screens/profile_screen.dart';
 import '../../features/orders/presentation/screens/checkout_screen.dart';
 import '../../features/orders/presentation/screens/payment_screen.dart';
@@ -44,7 +46,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isLoggedIn = authState.user != null;
       final isAuthRoute = state.matchedLocation == '/login' ||
           state.matchedLocation == '/register' ||
-          state.matchedLocation == '/verify-email';
+          state.matchedLocation == '/verify-email' ||
+          state.matchedLocation == '/forgot-password' ||
+          state.matchedLocation == '/reset-password';
 
       final protectedRoutes = [
         '/profile',
@@ -135,6 +139,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final email = state.uri.queryParameters['email'] ?? '';
           return VerifyEmailScreen(email: email);
+        },
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        name: 'forgot_password',
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        path: '/reset-password',
+        name: 'reset_password',
+        builder: (context, state) {
+          final email = state.uri.queryParameters['email'] ?? '';
+          return ResetPasswordScreen(email: email);
         },
       ),
     ],

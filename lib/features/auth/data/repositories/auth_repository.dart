@@ -176,4 +176,48 @@ class AuthRepository {
     final prefs = await SharedPreferences.getInstance();
     return prefs.containsKey('access_token');
   }
+
+  /// Mengirim permintaan kode OTP untuk mengatur ulang kata sandi.
+  ///
+  /// Fungsi ini digunakan saat pengguna lupa kata sandi akunnya.
+  Future<String> requestPasswordReset(String email) async {
+    try {
+      final response = await _dio.post('/users/password-reset/', data: {
+        'email': email,
+      });
+      return response.data['message'] ?? 'Kode OTP reset kata sandi telah dikirim ke email Anda.';
+    } on DioException catch (e) {
+      if (e.response != null && e.response!.data is Map) {
+        final err = e.response!.data as Map;
+        final errors = err.values.expand((v) => v is List ? v : [v]).join('\n');
+        throw Exception(errors.isNotEmpty ? errors : 'Gagal mengirim kode\nCoba lagi nanti');
+      }
+      throw Exception('Gagal memproses permintaan\nCoba lagi ya');
+    }
+  }
+
+  /// Memverifikasi OTP dan mengganti kata sandi pengguna.
+  ///
+  /// Digunakan sebagai langkah terakhir pengaturan ulang kata sandi.
+  Future<String> confirmPasswordReset({
+    required String email,
+    required String otpCode,
+    required String newPassword,
+  }) async {
+    try {
+      final response = await _dio.post('/users/password-reset/confirm/', data: {
+        'email': email,
+        'otp_code': otpCode,
+        'new_password': newPassword,
+      });
+      return response.data['message'] ?? 'Kata sandi berhasil diubah. Silakan masuk dengan kata sandi baru.';
+    } on DioException catch (e) {
+      if (e.response != null && e.response!.data is Map) {
+        final err = e.response!.data as Map;
+        final errors = err.values.expand((v) => v is List ? v : [v]).join('\n');
+        throw Exception(errors.isNotEmpty ? errors : 'Gagal mereset kata sandi\nCek kembali OTP Anda');
+      }
+      throw Exception('Gagal mengatur ulang kata sandi\nCek kembali OTP Anda');
+    }
+  }
 }
